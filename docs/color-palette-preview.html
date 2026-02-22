@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EmpDesignSystem — Color Palette Preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Helvetica Neue', sans-serif;
+    padding: 40px;
+    background: #fafafa;
+    color: #1a1a1a;
+  }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .subtitle { font-size: 14px; color: #737373; margin-bottom: 40px; }
+  h2 { font-size: 20px; font-weight: 600; margin: 40px 0 16px; }
+  h3 { font-size: 15px; font-weight: 600; margin: 24px 0 12px; color: #737373; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .theme-toggle {
+    position: fixed; top: 20px; right: 40px;
+    padding: 10px 20px; border-radius: 10px;
+    border: 1px solid #e5e5e5; background: white;
+    cursor: pointer; font-size: 14px; font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    z-index: 100;
+  }
+  .theme-toggle:hover { background: #f5f5f5; }
+
+  body.dark {
+    background: #0a0a0a;
+    color: #e5e5e5;
+  }
+  body.dark .theme-toggle {
+    background: #262626; border-color: #404040; color: #e5e5e5;
+  }
+  body.dark .theme-toggle:hover { background: #404040; }
+  body.dark .subtitle { color: #a3a3a3; }
+  body.dark h3 { color: #a3a3a3; }
+
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .color-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06);
+    background: white;
+    transition: transform 0.15s;
+  }
+  .color-card:hover { transform: scale(1.03); }
+  body.dark .color-card { background: #171717; border-color: rgba(255,255,255,0.08); }
+
+  .color-swatch {
+    height: 72px;
+    position: relative;
+  }
+  .color-info {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+  .color-name {
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+  .color-hex {
+    color: #a3a3a3;
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 10px;
+  }
+  body.dark .color-hex { color: #737373; }
+
+  .hue-section {
+    margin-bottom: 40px;
+  }
+  .hue-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .hue-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  .hue-name {
+    font-size: 17px; font-weight: 600;
+  }
+
+  .gradient-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .gradient-card {
+    height: 100px;
+    border-radius: 14px;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+  body.dark .gradient-card { border-color: rgba(255,255,255,0.08); }
+  .gradient-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 8px 12px;
+    font-size: 12px; font-weight: 600;
+    background: linear-gradient(transparent, rgba(0,0,0,0.3));
+    color: white;
+  }
+
+  .semantic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .semantic-card {
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.06);
+    background: white;
+  }
+  body.dark .semantic-card { background: #171717; border-color: rgba(255,255,255,0.08); }
+  .semantic-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .semantic-value { font-size: 11px; color: #a3a3a3; font-family: 'SF Mono', monospace; }
+  body.dark .semantic-value { color: #737373; }
+  .semantic-preview {
+    width: 100%; height: 36px; border-radius: 8px; margin-bottom: 10px;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  body.dark .semantic-preview { border-color: rgba(255,255,255,0.08); }
+
+  .divider {
+    height: 1px;
+    background: #e5e5e5;
+    margin: 48px 0;
+  }
+  body.dark .divider { background: #262626; }
+
+  /* Neutral comparison section */
+  .neutral-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  .neutral-variant {
+    border-radius: 16px;
+    border: 2px solid transparent;
+    padding: 20px;
+    background: white;
+    transition: border-color 0.2s;
+  }
+  .neutral-variant.selected { border-color: #6C63FF; }
+  body.dark .neutral-variant { background: #171717; }
+  body.dark .neutral-variant.selected { border-color: #8B84FF; }
+  .neutral-variant-title {
+    font-size: 16px; font-weight: 700; margin-bottom: 4px;
+  }
+  .neutral-variant-desc {
+    font-size: 12px; color: #a3a3a3; margin-bottom: 16px;
+  }
+  .neutral-strip {
+    display: flex; gap: 4px; margin-bottom: 16px; border-radius: 8px; overflow: hidden;
+  }
+  .neutral-strip div { height: 40px; flex: 1; }
+
+  /* Combo cards */
+  .combo-section { margin-top: 24px; }
+  .combo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .combo-card {
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+  }
+  .combo-card-title {
+    font-size: 14px; font-weight: 600; margin-bottom: 6px;
+  }
+  .combo-card-text {
+    font-size: 12px; opacity: 0.7;
+  }
+  .combo-card-border {
+    border-width: 1.5px; border-style: solid;
+  }
+  .combo-label {
+    font-size: 11px; font-weight: 500; color: #a3a3a3; margin-bottom: 8px;
+    text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  body.dark .combo-label { color: #737373; }
+
+  .vote-btn {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: 1px solid #e5e5e5;
+    background: white;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 12px;
+    transition: all 0.15s;
+  }
+  .vote-btn:hover { background: #f5f5f5; }
+  .vote-btn.active {
+    background: #6C63FF; color: white; border-color: #6C63FF;
+  }
+  body.dark .vote-btn { background: #262626; border-color: #404040; color: #e5e5e5; }
+  body.dark .vote-btn:hover { background: #404040; }
+  body.dark .vote-btn.active { background: #8B84FF; border-color: #8B84FF; color: white; }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()">Dark</button>
+
+<h1>EmpDesignSystem — Палитра цветов</h1>
+<p class="subtitle">Базовые примитивы · Семантические токены · Градиенты · Light & Dark</p>
+
+<!-- NEUTRAL COMPARISON -->
+<h2>Сравнение вариантов Neutral</h2>
+<p class="subtitle">Выбери какой серый лучше сочетается с палитрой</p>
+
+<div id="neutral-compare"></div>
+
+<h3>Как нейтральные смотрятся с цветными карточками</h3>
+<div id="combo-cards"></div>
+
+<div class="divider"></div>
+
+<!-- BASE COLORS -->
+<h2>Базовые цвета (Primitives)</h2>
+<p class="subtitle">UIColor.base.{hue}{step} / NSColor.base.{hue}{step}</p>
+
+<div id="base-colors"></div>
+
+<div class="divider"></div>
+
+<!-- SEMANTIC TOKENS -->
+<h2>Семантические токены (Semantic)</h2>
+<p class="subtitle">UIColor.semantic.{tokenName} / NSColor.semantic.{tokenName}</p>
+
+<div id="semantic-colors"></div>
+
+<div class="divider"></div>
+
+<!-- GRADIENTS -->
+<h2>Градиенты (Presets)</h2>
+<p class="subtitle">Готовые комбинации из палитры</p>
+
+<div id="gradients"></div>
+
+<script>
+// Three neutral variants
+const neutralVariants = {
+  neutral: {
+    name: 'Tailwind Neutral',
+    description: 'Чистый серый, без подтона',
+    light: { 50: '#fafafa', 100: '#f5f5f5', 200: '#e5e5e5', 300: '#d4d4d4', 500: '#737373', 700: '#404040', 900: '#171717' },
+    dark:  { 50: '#171717', 100: '#262626', 200: '#404040', 300: '#525252', 500: '#a3a3a3', 700: '#d4d4d4', 900: '#fafafa' }
+  },
+  zinc: {
+    name: 'Tailwind Zinc',
+    description: 'Чуть холодный подтон',
+    light: { 50: '#fafafa', 100: '#f4f4f5', 200: '#e4e4e7', 300: '#d4d4d8', 500: '#71717a', 700: '#3f3f46', 900: '#18181b' },
+    dark:  { 50: '#18181b', 100: '#27272a', 200: '#3f3f46', 300: '#52525b', 500: '#a1a1aa', 700: '#d4d4d8', 900: '#fafafa' }
+  },
+  slate: {
+    name: 'Tailwind Slate',
+    description: 'Заметный синий подтон',
+    light: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 500: '#64748b', 700: '#334155', 900: '#0f172a' },
+    dark:  { 50: '#0f172a', 100: '#1e293b', 200: '#334155', 300: '#475569', 500: '#94a3b8', 700: '#cbd5e1', 900: '#f8fafc' }
+  }
+};
+
+const palette = {
+  lavender: {
+    name: 'Lavender', description: 'Фиолетово-голубой',
+    light: { 50: '#F0F1FF', 100: '#E2E3FF', 200: '#C9C8FD', 300: '#9B97F5', 500: '#6C63FF' },
+    dark:  { 50: '#1E1F32', 100: '#2A2C48', 200: '#3F4170', 300: '#7D79DB', 500: '#8B84FF' }
+  },
+  mint: {
+    name: 'Mint', description: 'Мятно-зелёный',
+    light: { 50: '#EDFCF8', 100: '#D4F5EA', 200: '#B0ECDA', 300: '#6DD4BC', 500: '#2FB894' },
+    dark:  { 50: '#192E28', 100: '#223E34', 200: '#2E5A4C', 300: '#52BEA4', 500: '#3ED4AE' }
+  },
+  peach: {
+    name: 'Peach', description: 'Тёплый персиковый',
+    light: { 50: '#FFF7EC', 100: '#FFECD3', 200: '#FFDBB4', 300: '#F5B078', 500: '#F08C42' },
+    dark:  { 50: '#2E2519', 100: '#3E3223', 200: '#5C482F', 300: '#D49560', 500: '#F5A05A' }
+  },
+  rose: {
+    name: 'Rose', description: 'Нежно-розовый',
+    light: { 50: '#FFF0F1', 100: '#FFDEE2', 200: '#FFC8CF', 300: '#F58C99', 500: '#E85468' },
+    dark:  { 50: '#2E191E', 100: '#3E2328', 200: '#5C303B', 300: '#D86E7C', 500: '#F07080' }
+  },
+  sky: {
+    name: 'Sky', description: 'Голубой',
+    light: { 50: '#EDF6FF', 100: '#DAEDFF', 200: '#B5DCFF', 300: '#70BCF5', 500: '#3698F0' },
+    dark:  { 50: '#192535', 100: '#22334C', 200: '#2E4A6E', 300: '#58A8DB', 500: '#4EB0F5' }
+  },
+  lemon: {
+    name: 'Lemon', description: 'Тёплый жёлтый',
+    light: { 50: '#FFFCEB', 100: '#FFF5CC', 200: '#FFEBA5', 300: '#F5D160', 500: '#E8B420' },
+    dark:  { 50: '#2E2A17', 100: '#3E3820', 200: '#5C4F2C', 300: '#D4B648', 500: '#F0C838' }
+  },
+  lilac: {
+    name: 'Lilac', description: 'Сиренево-розовый',
+    light: { 50: '#F8F0FF', 100: '#EEDDFF', 200: '#DFC6FF', 300: '#BE8AF5', 500: '#9C52E0' },
+    dark:  { 50: '#26192E', 100: '#33233E', 200: '#48305C', 300: '#A86ED8', 500: '#B56EF5' }
+  }
+};
+
+let selectedNeutral = 'neutral';
+let isDark = false;
+
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.classList.toggle('dark', isDark);
+  document.querySelector('.theme-toggle').textContent = isDark ? 'Light' : 'Dark';
+  render();
+}
+
+function selectNeutral(key) {
+  selectedNeutral = key;
+  render();
+}
+
+function getNeutralColor(variant, step) {
+  const mode = isDark ? 'dark' : 'light';
+  return neutralVariants[variant][mode][step];
+}
+
+function getColor(hue, step) {
+  const mode = isDark ? 'dark' : 'light';
+  return palette[hue][mode][step];
+}
+
+function isLightColor(hex) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 > 128;
+}
+
+function render() {
+  renderNeutralCompare();
+  renderComboCards();
+  renderBaseColors();
+  renderSemanticColors();
+  renderGradients();
+}
+
+function renderNeutralCompare() {
+  const container = document.getElementById('neutral-compare');
+  container.innerHTML = '';
+
+  const grid = document.createElement('div');
+  grid.className = 'neutral-compare';
+
+  for (const [key, variant] of Object.entries(neutralVariants)) {
+    const card = document.createElement('div');
+    card.className = `neutral-variant ${key === selectedNeutral ? 'selected' : ''}`;
+    card.onclick = () => selectNeutral(key);
+    card.style.cursor = 'pointer';
+
+    // Color strip
+    const steps = [50, 100, 200, 300, 500, 700, 900];
+    const stripHTML = steps.map(s => `<div style="background:${getNeutralColor(key, s)}"></div>`).join('');
+
+    // Individual swatches with hex
+    const swatchesHTML = [50, 100, 200, 300, 500].map(s => {
+      const c = getNeutralColor(key, s);
+      return `<div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+        <div style="width:28px; height:28px; border-radius:6px; background:${c}; border:1px solid rgba(128,128,128,0.15); flex-shrink:0"></div>
+        <div>
+          <div style="font-size:11px; font-weight:600">${s}</div>
+          <div style="font-size:10px; font-family:monospace; color:${isDark ? '#737373' : '#a3a3a3'}">${c}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="neutral-variant-title">${variant.name}</div>
+      <div class="neutral-variant-desc">${variant.description}</div>
+      <div class="neutral-strip">${stripHTML}</div>
+      ${swatchesHTML}
+      <button class="vote-btn ${key === selectedNeutral ? 'active' : ''}">${key === selectedNeutral ? 'Выбран' : 'Выбрать'}</button>
+    `;
+
+    grid.appendChild(card);
+  }
+
+  container.appendChild(grid);
+}
+
+function renderComboCards() {
+  const container = document.getElementById('combo-cards');
+  container.innerHTML = '';
+
+  const cardHues = ['lavender', 'mint', 'peach', 'rose', 'sky', 'lilac'];
+
+  for (const [nKey, nVariant] of Object.entries(neutralVariants)) {
+    const label = document.createElement('div');
+    label.className = 'combo-label';
+    label.style.marginTop = '24px';
+    label.textContent = `${nVariant.name} — карточки на фоне neutral.50`;
+    container.appendChild(label);
+
+    // Background area simulating app
+    const bg = document.createElement('div');
+    bg.style.cssText = `
+      background: ${getNeutralColor(nKey, 50)};
+      border-radius: 16px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      border: 1px solid ${getNeutralColor(nKey, 200)};
+    `;
+
+    for (const hue of cardHues) {
+      const card = document.createElement('div');
+      const bg50 = getColor(hue, 50);
+      const border200 = getColor(hue, 200);
+      const accent500 = getColor(hue, 500);
+      const textColor = getNeutralColor(nKey, 900);
+      const subtextColor = getNeutralColor(nKey, 500);
+
+      card.style.cssText = `
+        background: ${bg50};
+        border: 1.5px solid ${border200};
+        border-radius: 12px;
+        padding: 16px;
+      `;
+      card.innerHTML = `
+        <div style="width:32px; height:32px; border-radius:8px; background:${accent500}; margin-bottom:10px; opacity:0.9"></div>
+        <div style="font-size:13px; font-weight:600; color:${textColor}; margin-bottom:4px">${palette[hue].name}</div>
+        <div style="font-size:11px; color:${subtextColor}">Пример карточки с текстом</div>
+      `;
+      bg.appendChild(card);
+    }
+
+    container.appendChild(bg);
+
+    // Text on neutral backgrounds
+    const textLabel = document.createElement('div');
+    textLabel.className = 'combo-label';
+    textLabel.style.marginTop = '16px';
+    textLabel.textContent = `${nVariant.name} — текст и разделители`;
+    container.appendChild(textLabel);
+
+    const textDemo = document.createElement('div');
+    textDemo.style.cssText = `
+      background: ${isDark ? getNeutralColor(nKey, 50) : '#ffffff'};
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid ${getNeutralColor(nKey, 200)};
+    `;
+    textDemo.innerHTML = `
+      <div style="font-size:18px; font-weight:700; color:${getNeutralColor(nKey, 900)}; margin-bottom:4px">Заголовок страницы</div>
+      <div style="font-size:13px; color:${getNeutralColor(nKey, 500)}; margin-bottom:16px">Вторичный текст с описанием</div>
+      <div style="height:1px; background:${getNeutralColor(nKey, 200)}; margin-bottom:16px"></div>
+      <div style="display:flex; gap:12px">
+        <div style="flex:1; background:${getNeutralColor(nKey, 100)}; border-radius:10px; padding:14px;">
+          <div style="font-size:12px; font-weight:600; color:${getNeutralColor(nKey, 900)}; margin-bottom:4px">Секция 1</div>
+          <div style="font-size:11px; color:${getNeutralColor(nKey, 500)}">neutral.100 фон</div>
+        </div>
+        <div style="flex:1; background:${getColor('lavender', 50)}; border:1px solid ${getColor('lavender', 200)}; border-radius:10px; padding:14px;">
+          <div style="font-size:12px; font-weight:600; color:${getNeutralColor(nKey, 900)}; margin-bottom:4px">Секция 2</div>
+          <div style="font-size:11px; color:${getNeutralColor(nKey, 500)}">lavender.50 фон</div>
+        </div>
+        <div style="flex:1; background:${getColor('mint', 50)}; border:1px solid ${getColor('mint', 200)}; border-radius:10px; padding:14px;">
+          <div style="font-size:12px; font-weight:600; color:${getNeutralColor(nKey, 900)}; margin-bottom:4px">Секция 3</div>
+          <div style="font-size:11px; color:${getNeutralColor(nKey, 500)}">mint.50 фон</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(textDemo);
+
+    if (nKey !== 'slate') {
+      const div = document.createElement('div');
+      div.className = 'divider';
+      div.style.margin = '32px 0';
+      container.appendChild(div);
+    }
+  }
+}
+
+function renderBaseColors() {
+  const baseContainer = document.getElementById('base-colors');
+  baseContainer.innerHTML = '';
+
+  // Colored hues
+  for (const [key, hue] of Object.entries(palette)) {
+    const section = document.createElement('div');
+    section.className = 'hue-section';
+
+    const header = document.createElement('div');
+    header.className = 'hue-header';
+    header.innerHTML = `
+      <div class="hue-dot" style="background: ${getColor(key, 300)}"></div>
+      <span class="hue-name">${hue.name}</span>
+      <span class="subtitle" style="margin:0; font-size:13px">${hue.description}</span>
+    `;
+    section.appendChild(header);
+
+    const grid = document.createElement('div');
+    grid.className = 'palette-grid';
+
+    for (const step of [50, 100, 200, 300, 500]) {
+      const color = getColor(key, step);
+      const card = document.createElement('div');
+      card.className = 'color-card';
+      card.innerHTML = `
+        <div class="color-swatch" style="background: ${color}"></div>
+        <div class="color-info">
+          <div class="color-name">${key}${step}</div>
+          <div class="color-hex">${color}</div>
+        </div>
+      `;
+      grid.appendChild(card);
+    }
+
+    section.appendChild(grid);
+    baseContainer.appendChild(section);
+  }
+
+  // Selected neutral
+  const nKey = selectedNeutral;
+  const nVariant = neutralVariants[nKey];
+  const section = document.createElement('div');
+  section.className = 'hue-section';
+  section.innerHTML = `
+    <div class="hue-header">
+      <div class="hue-dot" style="background: ${getNeutralColor(nKey, 300)}"></div>
+      <span class="hue-name">Neutral (${nVariant.name})</span>
+      <span class="subtitle" style="margin:0; font-size:13px">${nVariant.description}</span>
+    </div>
+  `;
+  const grid = document.createElement('div');
+  grid.className = 'palette-grid';
+  for (const step of [50, 100, 200, 300, 500]) {
+    const color = getNeutralColor(nKey, step);
+    const card = document.createElement('div');
+    card.className = 'color-card';
+    card.innerHTML = `
+      <div class="color-swatch" style="background: ${color}"></div>
+      <div class="color-info">
+        <div class="color-name">neutral${step}</div>
+        <div class="color-hex">${color}</div>
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+  section.appendChild(grid);
+  baseContainer.appendChild(section);
+}
+
+function renderSemanticColors() {
+  const nKey = selectedNeutral;
+  const semanticTokens = {
+    'Фоны (Background)': [
+      { name: 'backgroundPrimary', light: '#FFFFFF', dark: '#0a0a0a', maps: 'white / true black', desc: 'Основной фон приложения' },
+      { name: 'backgroundSecondary', lightFn: () => getNeutralColor(nKey, 50), darkFn: () => getNeutralColor(nKey, 50), maps: 'neutral.50', desc: 'Вторичный фон, секции' },
+      { name: 'backgroundTertiary', lightFn: () => getNeutralColor(nKey, 100), darkFn: () => getNeutralColor(nKey, 100), maps: 'neutral.100', desc: 'Третичный фон, вложенные элементы' },
+    ],
+    'Карточки (Cards)': [
+      { name: 'cardLavender', lightFn: () => getColor('lavender', 50), darkFn: () => getColor('lavender', 50), maps: 'lavender.50', desc: 'Фон карточки' },
+      { name: 'cardMint', lightFn: () => getColor('mint', 50), darkFn: () => getColor('mint', 50), maps: 'mint.50', desc: 'Фон карточки' },
+      { name: 'cardPeach', lightFn: () => getColor('peach', 50), darkFn: () => getColor('peach', 50), maps: 'peach.50', desc: 'Фон карточки' },
+      { name: 'cardRose', lightFn: () => getColor('rose', 50), darkFn: () => getColor('rose', 50), maps: 'rose.50', desc: 'Фон карточки' },
+      { name: 'cardSky', lightFn: () => getColor('sky', 50), darkFn: () => getColor('sky', 50), maps: 'sky.50', desc: 'Фон карточки' },
+    ],
+    'Бордеры (Borders)': [
+      { name: 'borderDefault', lightFn: () => getNeutralColor(nKey, 200), darkFn: () => getNeutralColor(nKey, 200), maps: 'neutral.200', desc: 'Стандартный бордер' },
+      { name: 'borderSubtle', lightFn: () => getNeutralColor(nKey, 100), darkFn: () => getNeutralColor(nKey, 100), maps: 'neutral.100', desc: 'Лёгкий бордер' },
+      { name: 'borderLavender', lightFn: () => getColor('lavender', 200), darkFn: () => getColor('lavender', 200), maps: 'lavender.200', desc: 'Акцентный бордер' },
+      { name: 'borderMint', lightFn: () => getColor('mint', 200), darkFn: () => getColor('mint', 200), maps: 'mint.200', desc: 'Акцентный бордер' },
+      { name: 'borderPeach', lightFn: () => getColor('peach', 200), darkFn: () => getColor('peach', 200), maps: 'peach.200', desc: 'Акцентный бордер' },
+    ],
+    'Текст (Text)': [
+      { name: 'textPrimary', lightFn: () => getNeutralColor(nKey, 900), darkFn: () => getNeutralColor(nKey, 900), maps: 'neutral.900', desc: 'Основной текст' },
+      { name: 'textSecondary', lightFn: () => getNeutralColor(nKey, 500), darkFn: () => getNeutralColor(nKey, 500), maps: 'neutral.500', desc: 'Вторичный текст' },
+      { name: 'textTertiary', lightFn: () => getNeutralColor(nKey, 300), darkFn: () => getNeutralColor(nKey, 300), maps: 'neutral.300', desc: 'Плейсхолдеры, хинты' },
+      { name: 'textAccent', lightFn: () => getColor('lavender', 500), darkFn: () => getColor('lavender', 500), maps: 'lavender.500', desc: 'Акцентный текст, ссылки' },
+    ],
+    'Действия (Actions)': [
+      { name: 'actionPrimary', lightFn: () => getColor('lavender', 500), darkFn: () => getColor('lavender', 500), maps: 'lavender.500', desc: 'Primary кнопки' },
+      { name: 'actionSuccess', lightFn: () => getColor('mint', 500), darkFn: () => getColor('mint', 500), maps: 'mint.500', desc: 'Успешные действия' },
+      { name: 'actionWarning', lightFn: () => getColor('peach', 500), darkFn: () => getColor('peach', 500), maps: 'peach.500', desc: 'Предупреждения' },
+      { name: 'actionDanger', lightFn: () => getColor('rose', 500), darkFn: () => getColor('rose', 500), maps: 'rose.500', desc: 'Опасные действия' },
+      { name: 'actionInfo', lightFn: () => getColor('sky', 500), darkFn: () => getColor('sky', 500), maps: 'sky.500', desc: 'Информационные' },
+    ]
+  };
+
+  const semanticContainer = document.getElementById('semantic-colors');
+  semanticContainer.innerHTML = '';
+
+  for (const [groupName, tokens] of Object.entries(semanticTokens)) {
+    const h3 = document.createElement('h3');
+    h3.textContent = groupName;
+    semanticContainer.appendChild(h3);
+
+    const grid = document.createElement('div');
+    grid.className = 'semantic-grid';
+
+    for (const token of tokens) {
+      let color;
+      if (token.lightFn) {
+        color = isDark ? token.darkFn() : token.lightFn();
+      } else {
+        color = isDark ? token.dark : token.light;
+      }
+
+      const card = document.createElement('div');
+      card.className = 'semantic-card';
+
+      card.innerHTML = `
+        <div class="semantic-preview" style="background: ${color}"></div>
+        <div class="semantic-name">.${token.name}</div>
+        <div class="semantic-value">${color} → ${token.maps}</div>
+        <div style="font-size:11px; color:${isDark ? '#737373' : '#a3a3a3'}; margin-top:2px">${token.desc}</div>
+      `;
+      grid.appendChild(card);
+    }
+
+    semanticContainer.appendChild(grid);
+  }
+}
+
+function renderGradients() {
+  const gradients = [
+    // Мягкие (шаг 200) — нежные, для фонов и карточек
+    { name: 'lavenderToSky', from: 'lavender', fromStep: 200, to: 'sky', toStep: 200, desc: 'Мягкий фиолетово-голубой' },
+    { name: 'skyToMint', from: 'sky', fromStep: 200, to: 'mint', toStep: 200, desc: 'Мягкий голубовато-мятный' },
+    { name: 'peachToRose', from: 'peach', fromStep: 200, to: 'rose', toStep: 200, desc: 'Мягкий персиково-розовый' },
+    { name: 'roseToLilac', from: 'rose', fromStep: 200, to: 'lilac', toStep: 200, desc: 'Мягкий розово-сиреневый' },
+    // Насыщенные (шаг 300) — для акцентов и выделения
+    { name: 'lavenderToLilac', from: 'lavender', fromStep: 300, to: 'lilac', toStep: 300, desc: 'Насыщенный фиолетово-сиреневый' },
+    { name: 'lemonToPeach', from: 'lemon', fromStep: 300, to: 'peach', toStep: 300, desc: 'Насыщенный закатный' },
+    { name: 'lavenderToMint', from: 'lavender', fromStep: 300, to: 'mint', toStep: 300, desc: 'Насыщенный фиолетово-мятный' },
+    { name: 'skyToLavender', from: 'sky', fromStep: 300, to: 'lavender', toStep: 300, desc: 'Насыщенный голубовато-фиолетовый' },
+  ];
+
+  const gradientContainer = document.getElementById('gradients');
+  gradientContainer.innerHTML = '';
+  const gradGrid = document.createElement('div');
+  gradGrid.className = 'gradient-grid';
+
+  for (const grad of gradients) {
+    const fromColor = getColor(grad.from, grad.fromStep);
+    const toColor = getColor(grad.to, grad.toStep);
+    const card = document.createElement('div');
+    card.className = 'gradient-card';
+    card.style.background = `linear-gradient(135deg, ${fromColor}, ${toColor})`;
+    card.innerHTML = `<div class="gradient-label">${grad.name}<br><span style="font-weight:400; font-size:10px; opacity:0.85">${grad.desc}</span></div>`;
+    gradGrid.appendChild(card);
+  }
+
+  gradientContainer.appendChild(gradGrid);
+}
+
+render();
+</script>
+</body>
+</html>
