@@ -13,6 +13,7 @@ Create UI components for EmpDesignSystem following established patterns. Both pl
 
 ```dot
 digraph create_component {
+    "Check branch (create feature/ if on master)" -> "Gather spec (interactive)";
     "Gather spec (interactive)" -> "Classify complexity";
     "Classify complexity" -> "Generate plan";
     "Generate plan" -> "User approves?";
@@ -32,6 +33,10 @@ digraph create_component {
     "Run lint" -> "Done" [label="pass"];
 }
 ```
+
+## Phase 0: Branch
+
+**BEFORE any work:** check current branch with `git branch`. If on `master` — create and switch to `feature/emp-<component-name>` BEFORE making any changes.
 
 ## Phase 1: Gather Spec
 
@@ -168,3 +173,4 @@ Read `./patterns.md` for code templates before writing ANY code. Every line of g
 | "Skip visual review, tests pass" | MUST read PNGs and verify visually |
 | "Use lineBreakMode .byTruncatingTail on macOS" | Use compression resistance 999 instead |
 | "Snapshots failed on 1st run = bug" | 1st run records refs, failure expected |
+| "Work directly on master" | ALWAYS create feature/ branch first |
