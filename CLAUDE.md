@@ -9,6 +9,7 @@ Always communicate with the user in Russian.
 - **NEVER commit changes yourself.** Write the code, then the user reviews and commits.
 - Every feature MUST be developed in a separate branch: `feature/<branch-name>`
 - Do NOT work directly on `master`
+- **Before starting any work:** check current branch with `git branch`. If on `master` — create and switch to `feature/<name>` BEFORE making any changes
 
 ## Project Overview
 
@@ -18,25 +19,29 @@ Design system project with reusable UI components for iOS (UIKit) and macOS (App
 
 - **Tuist 4.131.1** (managed via `mise.toml`)
 - **Swift**, UIKit (iOS), AppKit (macOS)
-- **No external dependencies**
+- **No external dependencies** in production code
+- **swift-snapshot-testing** — test-only dependency (via `Tuist/Package.swift`)
 
 ## Project Structure
 
 ```
-Project.swift              — Tuist project manifest (4 targets)
+Project.swift              — Tuist project manifest (6 targets)
 Tuist.swift                — Tuist configuration
-Tuist/Package.swift        — Dependencies (currently empty)
+Tuist/Package.swift        — External dependencies (swift-snapshot-testing)
+Tuist/Package.resolved     — Locked dependency versions (committed to git)
 EmpUI_iOS/Sources/         — iOS framework (UIKit)
-  Common/                  — CommonViewModel, UIView+CommonViewModel
+  Common/                  — CommonViewModel, nested types (+Border/+Shadow/+Corners), UIView+CommonViewModel
   Components/              — UI components
   Preview/                 — #Preview files
+EmpUI_iOS/Tests/           — iOS framework tests
 EmpUI_macOS/Sources/       — macOS framework (AppKit)
-  Common/                  — CommonViewModel, NSView+CommonViewModel
+  Common/                  — CommonViewModel, nested types, NSView+CommonViewModel, NSEdgeInsets+Equatable
   Components/              — UI components
   Preview/                 — #Preview files
+EmpUI_macOS/Tests/         — macOS framework tests
 EmpDesignSystem/Sources/   — Sandbox macOS app (Hello World)
 EmpDesignSystem/Resources/ — App resources
-EmpDesignSystem/Tests/     — Unit tests
+EmpDesignSystem/Tests/     — Sandbox app tests
 ```
 
 ## Targets
@@ -46,11 +51,16 @@ EmpDesignSystem/Tests/     — Unit tests
 | `EmpUI_iOS` | framework | iOS | — |
 | `EmpUI_macOS` | framework | macOS | — |
 | `EmpDesignSystem` | app | macOS | EmpUI_macOS |
+| `EmpUI_iOSTests` | unitTests | iOS | EmpUI_iOS, SnapshotTesting |
+| `EmpUI_macOSTests` | unitTests | macOS | EmpUI_macOS, SnapshotTesting |
 | `EmpDesignSystemTests` | unitTests | macOS | EmpDesignSystem |
 
 ## Commands
 
 ```bash
+# Install dependencies (required after changing Tuist/Package.swift)
+mise exec -- tuist install
+
 # Generate Xcode project (required before building)
 mise exec -- tuist generate --no-open
 
@@ -60,8 +70,21 @@ mise exec -- tuist build EmpDesignSystem
 # Build iOS framework
 mise exec -- tuist build EmpUI_iOS
 
-# Note: `tuist build` takes scheme as positional argument, NOT --scheme flag
+# Run macOS framework tests
+mise exec -- tuist test EmpUI_macOS
+
+# Run iOS framework tests
+mise exec -- tuist test EmpUI_iOS
+
+# Note: `tuist build`/`tuist test` takes scheme as positional argument, NOT --scheme flag
+# Note: Test targets don't have their own schemes — use framework scheme (EmpUI_macOS, EmpUI_iOS)
 ```
+
+## File Organization
+
+- **One file — one struct/class.** Nested types MUST be in separate files: `ClassName+NestedType.swift`
+- Example: `CommonViewModel.swift`, `CommonViewModel+Border.swift`, `CommonViewModel+Shadow.swift`, `CommonViewModel+Corners.swift`
+- Extensions on external types go to their own file: `NSEdgeInsets+Equatable.swift`
 
 ## Component Pattern
 
@@ -132,6 +155,8 @@ empLayoutMargins = viewModel.layoutMargins  // updates guide constraints interna
 - `apply(common:)` sets `layoutMargins` (iOS) or `empLayoutMargins` (macOS) — NEVER updates constraint constants manually
 - `apply(common:)` is a `UIView`/`NSView` extension in `Common/` directory — not a method on each component
 - CommonViewModel fields are all required with sensible defaults (no optionals)
+- CommonViewModel and all nested types conform to `Equatable` (auto-synthesized)
+- macOS: `NSEdgeInsets` is NOT natively `Equatable` — extension in `NSEdgeInsets+Equatable.swift` provides conformance via `@retroactive`
 
 ### CommonViewModel Properties
 
@@ -161,12 +186,25 @@ Always wrap configure calls with `let _ =`:
 
 Do NOT use explicit `return` — result builders forbid it.
 
+## Testing
+
+- **Swift Testing** — primary test framework (`import Testing`)
+- `@Suite("Название")` — group related tests
+- `@Test("Описание на русском языке")` — display name in Russian only
+- `@Test(arguments:)` — only when >1 element in the array, otherwise inline the value in the test
+- Function names — descriptive, no `test` prefix (e.g. `func defaultInitializer()`)
+- `#expect` for assertions, `#require` for preconditions
+- **swift-snapshot-testing** — for snapshot tests of component previews
+- Test files need explicit `import AppKit` (macOS) or `import UIKit` (iOS) — `@testable import` does not re-export platform frameworks
+
 ## SourceKit False Positives
 
 These diagnostics appear before `tuist generate` and are **not real errors**:
 
 - `No such module 'ProjectDescription'` in Project.swift — Tuist provides this at generation time
 - `No such module 'UIKit'` in EmpUI_iOS files — SourceKit runs in macOS context
+- `No such module 'Testing'` in test files — resolved at build time
+- `Cannot find type 'X' in scope` in `+NestedType.swift` extension files — same-module references resolve after generation
 - `Cannot find 'ComponentName' in scope` in Preview files — same-module references resolve after generation
 
 ## Design Docs
