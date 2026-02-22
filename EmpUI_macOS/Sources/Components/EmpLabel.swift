@@ -5,6 +5,7 @@ public final class EmpLabel: NSView {
     // MARK: - ViewModel
 
     public struct ViewModel {
+        public let common: CommonViewModel
         public let text: String
         public let style: Style
 
@@ -14,7 +15,12 @@ public final class EmpLabel: NSView {
             case caption
         }
 
-        public init(text: String, style: Style) {
+        public init(
+            common: CommonViewModel = CommonViewModel(),
+            text: String,
+            style: Style
+        ) {
+            self.common = common
             self.text = text
             self.style = style
         }
@@ -23,6 +29,13 @@ public final class EmpLabel: NSView {
     // MARK: - UI Elements
 
     private let textField = NSTextField(labelWithString: "")
+
+    // MARK: - Constraints
+
+    private var topConstraint: NSLayoutConstraint?
+    private var leadingConstraint: NSLayoutConstraint?
+    private var trailingConstraint: NSLayoutConstraint?
+    private var bottomConstraint: NSLayoutConstraint?
 
     // MARK: - Init
 
@@ -45,17 +58,25 @@ public final class EmpLabel: NSView {
         textField.translatesAutoresizingMaskIntoConstraints = false
         addSubview(textField)
 
-        NSLayoutConstraint.activate([
-            textField.topAnchor.constraint(equalTo: topAnchor),
-            textField.leadingAnchor.constraint(equalTo: leadingAnchor),
-            textField.trailingAnchor.constraint(equalTo: trailingAnchor),
-            textField.bottomAnchor.constraint(equalTo: bottomAnchor),
-        ])
+        let top = textField.topAnchor.constraint(equalTo: topAnchor)
+        let leading = textField.leadingAnchor.constraint(equalTo: leadingAnchor)
+        let trailing = textField.trailingAnchor.constraint(equalTo: trailingAnchor)
+        let bottom = textField.bottomAnchor.constraint(equalTo: bottomAnchor)
+
+        NSLayoutConstraint.activate([top, leading, trailing, bottom])
+
+        topConstraint = top
+        leadingConstraint = leading
+        trailingConstraint = trailing
+        bottomConstraint = bottom
     }
 
     // MARK: - Configure
 
     public func configure(with viewModel: ViewModel) {
+        apply(common: viewModel.common)
+        applyMargins(viewModel.common.layoutMargins)
+
         textField.stringValue = viewModel.text
 
         switch viewModel.style {
@@ -69,5 +90,12 @@ public final class EmpLabel: NSView {
             textField.font = .systemFont(ofSize: 12, weight: .regular)
             textField.textColor = .secondaryLabelColor
         }
+    }
+
+    private func applyMargins(_ margins: NSEdgeInsets) {
+        topConstraint?.constant = margins.top
+        leadingConstraint?.constant = margins.left
+        trailingConstraint?.constant = -margins.right
+        bottomConstraint?.constant = -margins.bottom
     }
 }
