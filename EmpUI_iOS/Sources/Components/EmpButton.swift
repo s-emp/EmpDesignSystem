@@ -5,6 +5,7 @@ public final class EmpButton: UIView {
     // MARK: - ViewModel
 
     public struct ViewModel {
+        public let common: CommonViewModel
         public let title: String
         public let style: Style
 
@@ -13,7 +14,12 @@ public final class EmpButton: UIView {
             case secondary
         }
 
-        public init(title: String, style: Style) {
+        public init(
+            common: CommonViewModel = CommonViewModel(),
+            title: String,
+            style: Style
+        ) {
+            self.common = common
             self.title = title
             self.style = style
         }
@@ -42,17 +48,17 @@ public final class EmpButton: UIView {
         addSubview(button)
 
         NSLayoutConstraint.activate([
-            button.topAnchor.constraint(equalTo: topAnchor),
-            button.leadingAnchor.constraint(equalTo: leadingAnchor),
-            button.trailingAnchor.constraint(equalTo: trailingAnchor),
-            button.bottomAnchor.constraint(equalTo: bottomAnchor),
+            button.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            button.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
+            button.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
+            button.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
         ])
     }
 
     // MARK: - Configure
 
     public func configure(with viewModel: ViewModel) {
-        button.setTitle(viewModel.title, for: .normal)
+        apply(common: viewModel.common)
 
         switch viewModel.style {
         case .primary:
