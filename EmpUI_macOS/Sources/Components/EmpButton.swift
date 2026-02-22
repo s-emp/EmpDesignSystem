@@ -29,13 +29,6 @@ public final class EmpButton: NSView {
 
     private let button = NSButton()
 
-    // MARK: - Constraints
-
-    private var topConstraint: NSLayoutConstraint?
-    private var leadingConstraint: NSLayoutConstraint?
-    private var trailingConstraint: NSLayoutConstraint?
-    private var bottomConstraint: NSLayoutConstraint?
-
     // MARK: - Init
 
     override public init(frame frameRect: NSRect) {
@@ -55,24 +48,18 @@ public final class EmpButton: NSView {
         button.translatesAutoresizingMaskIntoConstraints = false
         addSubview(button)
 
-        let top = button.topAnchor.constraint(equalTo: topAnchor)
-        let leading = button.leadingAnchor.constraint(equalTo: leadingAnchor)
-        let trailing = button.trailingAnchor.constraint(equalTo: trailingAnchor)
-        let bottom = button.bottomAnchor.constraint(equalTo: bottomAnchor)
-
-        NSLayoutConstraint.activate([top, leading, trailing, bottom])
-
-        topConstraint = top
-        leadingConstraint = leading
-        trailingConstraint = trailing
-        bottomConstraint = bottom
+        NSLayoutConstraint.activate([
+            button.topAnchor.constraint(equalTo: empLayoutMarginsGuide.topAnchor),
+            button.leadingAnchor.constraint(equalTo: empLayoutMarginsGuide.leadingAnchor),
+            button.trailingAnchor.constraint(equalTo: empLayoutMarginsGuide.trailingAnchor),
+            button.bottomAnchor.constraint(equalTo: empLayoutMarginsGuide.bottomAnchor),
+        ])
     }
 
     // MARK: - Configure
 
     public func configure(with viewModel: ViewModel) {
         apply(common: viewModel.common)
-        applyMargins(viewModel.common.layoutMargins)
 
         button.title = viewModel.title
 
@@ -84,12 +71,5 @@ public final class EmpButton: NSView {
             button.bezelColor = nil
             button.contentTintColor = .controlAccentColor
         }
-    }
-
-    private func applyMargins(_ margins: NSEdgeInsets) {
-        topConstraint?.constant = margins.top
-        leadingConstraint?.constant = margins.left
-        trailingConstraint?.constant = -margins.right
-        bottomConstraint?.constant = -margins.bottom
     }
 }

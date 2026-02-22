@@ -30,13 +30,6 @@ public final class EmpLabel: NSView {
 
     private let textField = NSTextField(labelWithString: "")
 
-    // MARK: - Constraints
-
-    private var topConstraint: NSLayoutConstraint?
-    private var leadingConstraint: NSLayoutConstraint?
-    private var trailingConstraint: NSLayoutConstraint?
-    private var bottomConstraint: NSLayoutConstraint?
-
     // MARK: - Init
 
     override public init(frame frameRect: NSRect) {
@@ -58,24 +51,18 @@ public final class EmpLabel: NSView {
         textField.translatesAutoresizingMaskIntoConstraints = false
         addSubview(textField)
 
-        let top = textField.topAnchor.constraint(equalTo: topAnchor)
-        let leading = textField.leadingAnchor.constraint(equalTo: leadingAnchor)
-        let trailing = textField.trailingAnchor.constraint(equalTo: trailingAnchor)
-        let bottom = textField.bottomAnchor.constraint(equalTo: bottomAnchor)
-
-        NSLayoutConstraint.activate([top, leading, trailing, bottom])
-
-        topConstraint = top
-        leadingConstraint = leading
-        trailingConstraint = trailing
-        bottomConstraint = bottom
+        NSLayoutConstraint.activate([
+            textField.topAnchor.constraint(equalTo: empLayoutMarginsGuide.topAnchor),
+            textField.leadingAnchor.constraint(equalTo: empLayoutMarginsGuide.leadingAnchor),
+            textField.trailingAnchor.constraint(equalTo: empLayoutMarginsGuide.trailingAnchor),
+            textField.bottomAnchor.constraint(equalTo: empLayoutMarginsGuide.bottomAnchor),
+        ])
     }
 
     // MARK: - Configure
 
     public func configure(with viewModel: ViewModel) {
         apply(common: viewModel.common)
-        applyMargins(viewModel.common.layoutMargins)
 
         textField.stringValue = viewModel.text
 
@@ -90,12 +77,5 @@ public final class EmpLabel: NSView {
             textField.font = .systemFont(ofSize: 12, weight: .regular)
             textField.textColor = .secondaryLabelColor
         }
-    }
-
-    private func applyMargins(_ margins: NSEdgeInsets) {
-        topConstraint?.constant = margins.top
-        leadingConstraint?.constant = margins.left
-        trailingConstraint?.constant = -margins.right
-        bottomConstraint?.constant = -margins.bottom
     }
 }

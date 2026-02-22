@@ -4,6 +4,12 @@
 
 Always communicate with the user in Russian.
 
+## Git Workflow
+
+- **NEVER commit changes yourself.** Write the code, then the user reviews and commits.
+- Every feature MUST be developed in a separate branch: `feature/<branch-name>`
+- Do NOT work directly on `master`
+
 ## Project Overview
 
 Design system project with reusable UI components for iOS (UIKit) and macOS (AppKit). Preview-driven development — the sandbox app is just Hello World, all component work happens through Xcode Previews.
@@ -92,15 +98,38 @@ Every component follows this layout:
 
 ```
 EmpComponent (UIView/NSView)  ← apply(common:) sets border/shadow/corners/bg/layoutMargins
-    └── content element        ← constrained to layoutMarginsGuide (iOS) or manual margins (macOS)
+    └── content element        ← constrained to layoutMarginsGuide
+```
+
+### Layout Margins Approach
+
+Content is pinned to `layoutMarginsGuide` via constraints. Margins are applied by setting `layoutMargins` — constraints are NEVER updated manually.
+
+- **iOS:** `UIView` has native `layoutMarginsGuide`. Just set `layoutMargins = margins`.
+- **macOS:** `NSView` does NOT have native `layoutMarginsGuide`. Use a custom `NSLayoutGuide` (called `empLayoutMarginsGuide`) added to the view. Setting margins updates the guide's edge constraints automatically.
+
+**Wrong (do NOT do this):**
+```swift
+// Storing constraint references and updating constants
+topConstraint?.constant = margins.top
+leadingConstraint?.constant = margins.left
+```
+
+**Correct:**
+```swift
+// iOS — native
+layoutMargins = viewModel.layoutMargins
+
+// macOS — custom guide, same concept
+empLayoutMargins = viewModel.layoutMargins  // updates guide constraints internally
 ```
 
 ### Rules
 
 - Every `ViewModel` MUST contain `common: CommonViewModel` as the first field
 - Every `configure(with:)` MUST call `apply(common: viewModel.common)` first
-- Content elements MUST be constrained to `layoutMarginsGuide` (iOS) — not to view edges
-- On macOS, `NSView` has no `layoutMarginsGuide` — use stored constraint references and `applyMargins()` helper
+- Content elements MUST be constrained to `layoutMarginsGuide` (iOS) or `empLayoutMarginsGuide` (macOS) — NEVER to view edges directly
+- `apply(common:)` sets `layoutMargins` (iOS) or `empLayoutMargins` (macOS) — NEVER updates constraint constants manually
 - `apply(common:)` is a `UIView`/`NSView` extension in `Common/` directory — not a method on each component
 - CommonViewModel fields are all required with sensible defaults (no optionals)
 
