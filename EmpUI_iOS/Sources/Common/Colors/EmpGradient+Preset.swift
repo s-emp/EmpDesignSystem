@@ -1,9 +1,7 @@
 import UIKit
 
-extension EmpGradient {
-
-    public enum Preset {
-
+public extension EmpGradient {
+    enum Preset {
         // MARK: - Soft (step 200)
 
         public static let lavenderToSky = EmpGradient(startColor: UIColor.Base.lavender200, endColor: UIColor.Base.sky200)

@@ -4,6 +4,7 @@ import Testing
 
 // MARK: - Helper
 
+// swiftlint:disable force_unwrapping
 private func resolvedHex(_ color: NSColor, dark: Bool) -> UInt32 {
     let saved = NSAppearance.current
     NSAppearance.current = NSAppearance(named: dark ? .darkAqua : .aqua)!
@@ -16,20 +17,21 @@ private func resolvedHex(_ color: NSColor, dark: Bool) -> UInt32 {
     return (r << 16) | (g << 8) | b
 }
 
+// swiftlint:enable force_unwrapping
+
 // MARK: - NSAppearance+isDark
 
 @Suite("NSAppearance+isDark")
 struct NSAppearanceIsDarkTests {
-
     @Test("aqua — не dark")
-    func aquaIsNotDark() {
-        let appearance = NSAppearance(named: .aqua)!
+    func aquaIsNotDark() throws {
+        let appearance = try #require(NSAppearance(named: .aqua))
         #expect(!appearance.isDark)
     }
 
     @Test("darkAqua — dark")
-    func darkAquaIsDark() {
-        let appearance = NSAppearance(named: .darkAqua)!
+    func darkAquaIsDark() throws {
+        let appearance = try #require(NSAppearance(named: .darkAqua))
         #expect(appearance.isDark)
     }
 }
@@ -38,7 +40,6 @@ struct NSAppearanceIsDarkTests {
 
 @Suite("NSColor.Base — Lavender")
 struct BaseLavenderTests {
-
     @Test("Lavender light mode", arguments: [
         (NSColor.Base.lavender50, UInt32(0xF0F1FF)),
         (NSColor.Base.lavender100, UInt32(0xE2E3FF)),
@@ -66,7 +67,6 @@ struct BaseLavenderTests {
 
 @Suite("NSColor.Base — Mint")
 struct BaseMintTests {
-
     @Test("Mint light mode", arguments: [
         (NSColor.Base.mint50, UInt32(0xEDFCF8)),
         (NSColor.Base.mint100, UInt32(0xD4F5EA)),
@@ -94,7 +94,6 @@ struct BaseMintTests {
 
 @Suite("NSColor.Base — Peach")
 struct BasePeachTests {
-
     @Test("Peach light mode", arguments: [
         (NSColor.Base.peach50, UInt32(0xFFF7EC)),
         (NSColor.Base.peach100, UInt32(0xFFECD3)),
@@ -122,7 +121,6 @@ struct BasePeachTests {
 
 @Suite("NSColor.Base — Rose")
 struct BaseRoseTests {
-
     @Test("Rose light mode", arguments: [
         (NSColor.Base.rose50, UInt32(0xFFF0F1)),
         (NSColor.Base.rose100, UInt32(0xFFDEE2)),
@@ -150,7 +148,6 @@ struct BaseRoseTests {
 
 @Suite("NSColor.Base — Sky")
 struct BaseSkyTests {
-
     @Test("Sky light mode", arguments: [
         (NSColor.Base.sky50, UInt32(0xEDF6FF)),
         (NSColor.Base.sky100, UInt32(0xDAEDFF)),
@@ -178,7 +175,6 @@ struct BaseSkyTests {
 
 @Suite("NSColor.Base — Lemon")
 struct BaseLemonTests {
-
     @Test("Lemon light mode", arguments: [
         (NSColor.Base.lemon50, UInt32(0xFFFCEB)),
         (NSColor.Base.lemon100, UInt32(0xFFF5CC)),
@@ -206,7 +202,6 @@ struct BaseLemonTests {
 
 @Suite("NSColor.Base — Lilac")
 struct BaseLilacTests {
-
     @Test("Lilac light mode", arguments: [
         (NSColor.Base.lilac50, UInt32(0xF8F0FF)),
         (NSColor.Base.lilac100, UInt32(0xEEDDFF)),
@@ -234,7 +229,6 @@ struct BaseLilacTests {
 
 @Suite("NSColor.Base — Neutral")
 struct BaseNeutralTests {
-
     @Test("Neutral light mode", arguments: [
         (NSColor.Base.neutral50, UInt32(0xFAFAFA)),
         (NSColor.Base.neutral100, UInt32(0xF5F5F5)),

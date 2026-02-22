@@ -1,7 +1,6 @@
 import UIKit
 
 public extension UIColor.Base {
-
     static let peach50 = UIColor { $0.userInterfaceStyle == .dark ? UIColor(hex: 0x2E2519) : UIColor(hex: 0xFFF7EC) }
     static let peach100 = UIColor { $0.userInterfaceStyle == .dark ? UIColor(hex: 0x3E3223) : UIColor(hex: 0xFFECD3) }
     static let peach200 = UIColor { $0.userInterfaceStyle == .dark ? UIColor(hex: 0x5C482F) : UIColor(hex: 0xFFDBB4) }

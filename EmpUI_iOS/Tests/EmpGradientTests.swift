@@ -4,7 +4,6 @@ import UIKit
 
 @Suite("EmpGradient")
 struct EmpGradientTests {
-
     @Test("Инициализация сохраняет цвета", arguments: [
         (true, UIColor.Base.lavender200),
         (false, UIColor.Base.sky200),

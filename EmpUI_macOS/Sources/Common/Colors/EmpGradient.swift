@@ -1,7 +1,6 @@
 import AppKit
 
 public struct EmpGradient: Equatable {
-
     public let startColor: NSColor
     public let endColor: NSColor
 
@@ -11,8 +10,8 @@ public struct EmpGradient: Equatable {
     }
 
     public func resolvedColors(for appearance: NSAppearance) -> (start: CGColor, end: CGColor) {
-        var start: CGColor!
-        var end: CGColor!
+        var start: CGColor = CGColor.clear
+        var end: CGColor = CGColor.clear
         appearance.performAsCurrentDrawingAppearance {
             start = startColor.cgColor
             end = endColor.cgColor

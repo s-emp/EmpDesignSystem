@@ -4,7 +4,6 @@ import Testing
 
 @Suite("EmpGradient")
 struct EmpGradientTests {
-
     @Test("Инициализация сохраняет цвета", arguments: [
         (true, NSColor.Base.lavender200),
         (false, NSColor.Base.sky200),
@@ -23,9 +22,9 @@ struct EmpGradientTests {
     }
 
     @Test("resolvedColors возвращает CGColor", arguments: [true, false])
-    func resolvedColors(isStart: Bool) {
+    func resolvedColors(isStart: Bool) throws {
         let gradient = EmpGradient.Preset.lavenderToSky
-        let appearance = NSAppearance(named: .aqua)!
+        let appearance = try #require(NSAppearance(named: .aqua))
         let (start, end) = gradient.resolvedColors(for: appearance)
         let color = isStart ? start : end
         #expect(color.numberOfComponents >= 3)

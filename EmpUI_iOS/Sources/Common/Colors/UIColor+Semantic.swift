@@ -1,12 +1,12 @@
 import UIKit
 
-public extension UIColor {
+// MARK: - UIColor.Semantic
 
-    enum Semantic {}
+public extension UIColor {
+    enum Semantic { }
 }
 
 public extension UIColor.Semantic {
-
     // MARK: - Backgrounds
 
     static let backgroundPrimary = UIColor { $0.userInterfaceStyle == .dark ? UIColor(hex: 0x0A0A0A) : .white }
@@ -42,6 +42,11 @@ public extension UIColor.Semantic {
     static let textTertiary = UIColor.Base.neutral300
     static let textAccent = UIColor.Base.lavender500
 
+    // MARK: - Text - Inverted (on colored backgrounds)
+
+    static let textPrimaryInverted = UIColor.Base.neutralInverted900
+    static let textSecondaryInverted = UIColor.Base.neutralInverted500
+
     // MARK: - Actions
 
     static let actionPrimary = UIColor.Base.lavender500
@@ -49,4 +54,21 @@ public extension UIColor.Semantic {
     static let actionWarning = UIColor.Base.peach500
     static let actionDanger = UIColor.Base.rose500
     static let actionInfo = UIColor.Base.sky500
+
+    // MARK: - Actions - Hover
+
+    static let actionPrimaryHover = UIColor.Base.lavender300
+    static let actionDangerHover = UIColor.Base.rose300
+
+    // MARK: - Actions - Tint (subtle background)
+
+    static let actionPrimaryTint = UIColor.Base.lavender50
+    static let actionDangerTint = UIColor.Base.rose50
+
+    // MARK: - Actions - Base (subtle filled)
+
+    static let actionPrimaryBase = UIColor.Base.neutral100
+    static let actionPrimaryBaseHover = UIColor.Base.neutral200
+    static let actionDangerBase = UIColor.Base.rose50
+    static let actionDangerBaseHover = UIColor.Base.rose100
 }
