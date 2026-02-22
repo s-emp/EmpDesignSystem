@@ -5,6 +5,7 @@ public final class EmpButton: NSView {
     // MARK: - ViewModel
 
     public struct ViewModel {
+        public let common: CommonViewModel
         public let title: String
         public let style: Style
 
@@ -13,7 +14,12 @@ public final class EmpButton: NSView {
             case secondary
         }
 
-        public init(title: String, style: Style) {
+        public init(
+            common: CommonViewModel = CommonViewModel(),
+            title: String,
+            style: Style
+        ) {
+            self.common = common
             self.title = title
             self.style = style
         }
@@ -22,6 +28,13 @@ public final class EmpButton: NSView {
     // MARK: - UI Elements
 
     private let button = NSButton()
+
+    // MARK: - Constraints
+
+    private var topConstraint: NSLayoutConstraint?
+    private var leadingConstraint: NSLayoutConstraint?
+    private var trailingConstraint: NSLayoutConstraint?
+    private var bottomConstraint: NSLayoutConstraint?
 
     // MARK: - Init
 
@@ -42,17 +55,25 @@ public final class EmpButton: NSView {
         button.translatesAutoresizingMaskIntoConstraints = false
         addSubview(button)
 
-        NSLayoutConstraint.activate([
-            button.topAnchor.constraint(equalTo: topAnchor),
-            button.leadingAnchor.constraint(equalTo: leadingAnchor),
-            button.trailingAnchor.constraint(equalTo: trailingAnchor),
-            button.bottomAnchor.constraint(equalTo: bottomAnchor),
-        ])
+        let top = button.topAnchor.constraint(equalTo: topAnchor)
+        let leading = button.leadingAnchor.constraint(equalTo: leadingAnchor)
+        let trailing = button.trailingAnchor.constraint(equalTo: trailingAnchor)
+        let bottom = button.bottomAnchor.constraint(equalTo: bottomAnchor)
+
+        NSLayoutConstraint.activate([top, leading, trailing, bottom])
+
+        topConstraint = top
+        leadingConstraint = leading
+        trailingConstraint = trailing
+        bottomConstraint = bottom
     }
 
     // MARK: - Configure
 
     public func configure(with viewModel: ViewModel) {
+        apply(common: viewModel.common)
+        applyMargins(viewModel.common.layoutMargins)
+
         button.title = viewModel.title
 
         switch viewModel.style {
@@ -63,5 +84,12 @@ public final class EmpButton: NSView {
             button.bezelColor = nil
             button.contentTintColor = .controlAccentColor
         }
+    }
+
+    private func applyMargins(_ margins: NSEdgeInsets) {
+        topConstraint?.constant = margins.top
+        leadingConstraint?.constant = margins.left
+        trailingConstraint?.constant = -margins.right
+        bottomConstraint?.constant = -margins.bottom
     }
 }
