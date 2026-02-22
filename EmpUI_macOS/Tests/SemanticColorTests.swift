@@ -82,7 +82,6 @@ struct SemanticColorTests {
     func actionDanger() {
         #expect(NSColor.Semantic.actionDanger === NSColor.Base.rose500)
     }
-<<<<<<< HEAD
 
     // MARK: - Actions — Hover
 
@@ -141,6 +140,4 @@ struct SemanticColorTests {
     func textSecondaryInverted() {
         #expect(NSColor.Semantic.textSecondaryInverted === NSColor.Base.neutralInverted500)
     }
-=======
->>>>>>> feature/emp-image
 }
