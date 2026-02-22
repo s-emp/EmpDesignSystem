@@ -21,9 +21,11 @@ Project.swift              — Tuist project manifest (4 targets)
 Tuist.swift                — Tuist configuration
 Tuist/Package.swift        — Dependencies (currently empty)
 EmpUI_iOS/Sources/         — iOS framework (UIKit)
+  Common/                  — CommonViewModel, UIView+CommonViewModel
   Components/              — UI components
   Preview/                 — #Preview files
 EmpUI_macOS/Sources/       — macOS framework (AppKit)
+  Common/                  — CommonViewModel, NSView+CommonViewModel
   Components/              — UI components
   Preview/                 — #Preview files
 EmpDesignSystem/Sources/   — Sandbox macOS app (Hello World)
@@ -69,16 +71,48 @@ Every component follows this structure:
 ```swift
 public final class EmpButton: UIView {
     public struct ViewModel {
+        public let common: CommonViewModel
         public let title: String
         public let style: Style
         public enum Style { case primary, secondary }
-        public init(title: String, style: Style) { ... }
+        public init(common: CommonViewModel = CommonViewModel(), title: String, style: Style) { ... }
     }
-    public func configure(with viewModel: ViewModel) { ... }
+    public func configure(with viewModel: ViewModel) {
+        apply(common: viewModel.common)
+        // component-specific configuration...
+    }
 }
 ```
 
 ### macOS — same pattern but inherits from `NSView`
+
+## Component Architecture
+
+Every component follows this layout:
+
+```
+EmpComponent (UIView/NSView)  ← apply(common:) sets border/shadow/corners/bg/layoutMargins
+    └── content element        ← constrained to layoutMarginsGuide (iOS) or manual margins (macOS)
+```
+
+### Rules
+
+- Every `ViewModel` MUST contain `common: CommonViewModel` as the first field
+- Every `configure(with:)` MUST call `apply(common: viewModel.common)` first
+- Content elements MUST be constrained to `layoutMarginsGuide` (iOS) — not to view edges
+- On macOS, `NSView` has no `layoutMarginsGuide` — use stored constraint references and `applyMargins()` helper
+- `apply(common:)` is a `UIView`/`NSView` extension in `Common/` directory — not a method on each component
+- CommonViewModel fields are all required with sensible defaults (no optionals)
+
+### CommonViewModel Properties
+
+| Property | Type (iOS) | Type (macOS) | Default |
+|----------|-----------|-------------|---------|
+| `border` | `CommonViewModel.Border` | same | width=0, color=.clear, solid |
+| `shadow` | `CommonViewModel.Shadow` | same | no shadow |
+| `corners` | `CommonViewModel.Corners` | same | radius=0, all corners |
+| `backgroundColor` | `UIColor` | `NSColor` | `.clear` |
+| `layoutMargins` | `UIEdgeInsets` | `NSEdgeInsets` | `.zero` |
 
 ## Critical: #Preview with AppKit/UIKit Views
 
