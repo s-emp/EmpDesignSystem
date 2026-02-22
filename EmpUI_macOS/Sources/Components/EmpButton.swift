@@ -135,7 +135,10 @@ public final class EmpButton: NSView {
             let label = NSTextField(labelWithString: string)
             label.font = font
             label.textColor = color
-            label.lineBreakMode = .byTruncatingTail
+            label.setContentCompressionResistancePriority(
+                NSLayoutConstraint.Priority(rawValue: 999),
+                for: .horizontal
+            )
             return label
 
         case let .titleSubtitle(title, subtitle, titleColor, subtitleColor, titleFont, subtitleFont):

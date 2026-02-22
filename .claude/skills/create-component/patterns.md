@@ -635,6 +635,234 @@ struct EmpXPresetTests {
 }
 ```
 
+## Snapshot Test Pattern (Interactive, macOS)
+
+```swift
+import AppKit
+import SnapshotTesting
+import Testing
+@testable import EmpUI_macOS
+
+// MARK: - Test Config
+
+enum XStyle: String, CaseIterable, Sendable {
+    case filled, base, outlined, ghost
+}
+
+enum XColor: String, CaseIterable, Sendable {
+    case primary, danger
+
+    // MARK: Internal
+
+    var preset: EmpX.Preset.ColorVariant {
+        switch self {
+        case .primary:
+            .primary
+        case .danger:
+            .danger
+        }
+    }
+}
+
+enum XSize: String, CaseIterable, Sendable {
+    case small, medium, large
+
+    // MARK: Internal
+
+    var preset: EmpX.Preset.Size {
+        switch self {
+        case .small:
+            .small
+        case .medium:
+            .medium
+        case .large:
+            .large
+        }
+    }
+}
+
+struct PresetCase: Sendable, CustomTestStringConvertible {
+    let style: XStyle
+    let color: XColor
+    let size: XSize
+
+    var testDescription: String {
+        "\(style.rawValue)-\(color.rawValue)-\(size.rawValue)"
+    }
+
+    func makeViewModel() -> EmpX.ViewModel {
+        let layout = EmpX.Preset.ContentLayout(center: .text("Label"))
+        switch style {
+        case .filled:
+            return EmpX.Preset.filled(color.preset, content: layout, size: size.preset)
+        case .base:
+            return EmpX.Preset.base(color.preset, content: layout, size: size.preset)
+        case .outlined:
+            return EmpX.Preset.outlined(color.preset, content: layout, size: size.preset)
+        case .ghost:
+            return EmpX.Preset.ghost(color.preset, content: layout, size: size.preset)
+        }
+    }
+
+    static let all: [PresetCase] = XStyle.allCases.flatMap { style in
+        XColor.allCases.flatMap { color in
+            XSize.allCases.map { size in
+                PresetCase(style: style, color: color, size: size)
+            }
+        }
+    }
+}
+
+// MARK: - Tests
+
+@Suite("EmpX — Snapshots")
+struct EmpXSnapshotTests {
+    @Test("Пресеты", arguments: PresetCase.all)
+    @MainActor
+    func preset(_ config: PresetCase) {
+        let viewModel = config.makeViewModel()
+        let view = EmpX()
+        view.configure(with: viewModel)
+        assertSnapshot(
+            of: view,
+            as: .image(size: CGSize(width: 200, height: viewModel.height)),
+            named: config.testDescription
+        )
+    }
+
+    @Test("Иконка + текст")
+    @MainActor
+    func iconAndText() throws {
+        let icon = try #require(NSImage(systemSymbolName: "lock.fill", accessibilityDescription: nil))
+        let viewModel = EmpX.Preset.filled(.primary, content: .init(
+            leading: .icon(icon),
+            center: .text("Sign In")
+        ))
+        let view = EmpX()
+        view.configure(with: viewModel)
+        assertSnapshot(of: view, as: .image(size: CGSize(width: 200, height: viewModel.height)))
+    }
+
+    @Test("Текст + иконка")
+    @MainActor
+    func textAndIcon() throws {
+        let icon = try #require(NSImage(systemSymbolName: "arrow.right", accessibilityDescription: nil))
+        let viewModel = EmpX.Preset.filled(.primary, content: .init(
+            center: .text("Next"),
+            trailing: .icon(icon)
+        ))
+        let view = EmpX()
+        view.configure(with: viewModel)
+        assertSnapshot(of: view, as: .image(size: CGSize(width: 200, height: viewModel.height)))
+    }
+
+    @Test("Только иконка")
+    @MainActor
+    func iconOnly() throws {
+        let icon = try #require(NSImage(systemSymbolName: "plus", accessibilityDescription: nil))
+        let viewModel = EmpX.Preset.filled(.primary, content: .init(center: .icon(icon)))
+        let view = EmpX()
+        view.configure(with: viewModel)
+        assertSnapshot(of: view, as: .image(size: CGSize(width: 60, height: viewModel.height)))
+    }
+
+    @Test("Disabled")
+    @MainActor
+    func disabled() {
+        let viewModel = EmpX.Preset.filled(.primary, content: .init(center: .text("Disabled")))
+        let view = EmpX()
+        view.configure(with: viewModel)
+        view.isEnabled = false
+        assertSnapshot(of: view, as: .image(size: CGSize(width: 200, height: viewModel.height)))
+    }
+}
+```
+
+## Snapshot Test Pattern (Interactive, iOS)
+
+Same structure but with UIKit differences:
+
+```swift
+import SnapshotTesting
+import Testing
+import UIKit
+@testable import EmpUI_iOS
+
+// Helper enums identical to macOS (XStyle, XColor, XSize, PresetCase)
+// Only difference: makeViewModel uses same API since Preset is platform-matched
+
+@Suite("EmpX — Snapshots")
+struct EmpXSnapshotTests {
+    // @Test("Пресеты", arguments: PresetCase.all) — same as macOS
+
+    @Test("Иконка + текст")
+    @MainActor
+    func iconAndText() throws {
+        let icon = try #require(UIImage(systemName: "lock.fill"))
+        // ... rest identical to macOS
+    }
+
+    // Other tests identical — only UIImage(systemName:) instead of NSImage(systemSymbolName:...)
+}
+```
+
+## Snapshot Test Pattern (Simple Component)
+
+For simple components without Preset, test each visual configuration:
+
+```swift
+import AppKit  // or UIKit
+import SnapshotTesting
+import Testing
+@testable import EmpUI_macOS  // or EmpUI_iOS
+
+@Suite("EmpX — Snapshots")
+struct EmpXSnapshotTests {
+    @Test("Дефолтная конфигурация")
+    @MainActor
+    func defaultConfig() {
+        let view = EmpX()
+        view.configure(with: .init(text: "Hello"))
+        assertSnapshot(of: view, as: .image(size: CGSize(width: 200, height: 40)))
+    }
+
+    @Test("Длинный текст")
+    @MainActor
+    func longText() {
+        let view = EmpX()
+        view.configure(with: .init(text: "Very long text that should handle overflow"))
+        assertSnapshot(of: view, as: .image(size: CGSize(width: 200, height: 40)))
+    }
+
+    // One test per meaningful visual variation
+}
+```
+
+## Snapshot Visual Review Checklist
+
+After generating snapshots, read EVERY PNG from `__Snapshots__/EmpXSnapshotTests/` using Read tool. Check:
+
+| Check | What to look for |
+|-------|-----------------|
+| **Text** | Not truncated ("..." or clipped). Full text visible. |
+| **Icons** | Present, correct size, not clipped |
+| **Padding** | Content not touching edges. Visible margins. |
+| **Corners** | Rounded corners visible on filled/base/outlined |
+| **Colors** | filled=colored bg+white text, base=subtle bg, outlined=border+colored text, ghost=no bg |
+| **Disabled** | Semi-transparent (alpha ~0.4) |
+| **Sizes** | Small < Medium < Large visually distinct |
+| **Consistency** | Same style renders identically across colors |
+
+## Known Gotchas
+
+| Issue | Platform | Fix |
+|-------|----------|-----|
+| NSTextField truncates text in Auto Layout | macOS | Use `setContentCompressionResistancePriority(999, .horizontal)` instead of `lineBreakMode = .byTruncatingTail` |
+| UILabel truncation works fine | iOS | `lineBreakMode = .byTruncatingTail` is OK |
+| 1st snapshot run always fails | Both | Expected — records reference images. Run twice. |
+| System symbol names differ | macOS vs iOS | macOS: `NSImage(systemSymbolName:accessibilityDescription:)`, iOS: `UIImage(systemName:)` |
+| Snapshot size must match component | Both | Use `CGSize(width: 200, height: viewModel.height)` — adapt width for icon-only (60pt) |
+
 ## Platform Differences Cheatsheet
 
 | Aspect | macOS | iOS |
@@ -654,8 +882,8 @@ struct EmpXPresetTests {
 | Init | `init(frame frameRect: NSRect)` | `init(frame: CGRect)` |
 | Layer setup | `wantsLayer = true` (required) | Not needed |
 | Cursor | `resetCursorRects()` | Not needed |
-| Hover | `mouseEntered/mouseExited` | Not available |
-| Appearance change | `viewDidChangeEffectiveAppearance()` | `traitCollectionDidChange()` |
+| Hover | `mouseEntered/mouseExited` + NSTrackingArea | `UIHoverGestureRecognizer` (iPad trackpad) |
+| Appearance change | `viewDidChangeEffectiveAppearance()` | `registerForTraitChanges` (iOS 17+) |
 | Tracking area | Required for hover | Not needed |
 | ControlState | normal, hover, highlighted, disabled | normal, highlighted, disabled |
 | Preview availability | `@available(macOS 14.0, *)` | `@available(iOS 17.0, *)` |
