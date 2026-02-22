@@ -5,6 +5,7 @@ public final class EmpLabel: UIView {
     // MARK: - ViewModel
 
     public struct ViewModel {
+        public let common: CommonViewModel
         public let text: String
         public let style: Style
 
@@ -14,7 +15,12 @@ public final class EmpLabel: UIView {
             case caption
         }
 
-        public init(text: String, style: Style) {
+        public init(
+            common: CommonViewModel = CommonViewModel(),
+            text: String,
+            style: Style
+        ) {
+            self.common = common
             self.text = text
             self.style = style
         }
@@ -43,16 +49,18 @@ public final class EmpLabel: UIView {
         addSubview(label)
 
         NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: topAnchor),
-            label.leadingAnchor.constraint(equalTo: leadingAnchor),
-            label.trailingAnchor.constraint(equalTo: trailingAnchor),
-            label.bottomAnchor.constraint(equalTo: bottomAnchor),
+            label.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
+            label.leadingAnchor.constraint(equalTo: layoutMarginsGuide.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: layoutMarginsGuide.trailingAnchor),
+            label.bottomAnchor.constraint(equalTo: layoutMarginsGuide.bottomAnchor),
         ])
     }
 
     // MARK: - Configure
 
     public func configure(with viewModel: ViewModel) {
+        apply(common: viewModel.common)
+
         label.text = viewModel.text
 
         switch viewModel.style {
