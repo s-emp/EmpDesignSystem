@@ -16,7 +16,6 @@ private func resolvedHex(_ color: NSColor, dark: Bool) -> UInt32 {
 
 @Suite("NSColor.Semantic")
 struct SemanticColorTests {
-
     @Test("backgroundPrimary — white/dark", arguments: [
         (false, UInt32(0xFFFFFF)),
         (true, UInt32(0x0A0A0A)),
@@ -31,10 +30,14 @@ struct SemanticColorTests {
     }
 
     @Test("textPrimary ссылается на neutral900")
-    func textPrimary() { #expect(NSColor.Semantic.textPrimary === NSColor.Base.neutral900) }
+    func textPrimary() {
+        #expect(NSColor.Semantic.textPrimary === NSColor.Base.neutral900)
+    }
 
     @Test("actionPrimary ссылается на lavender500")
-    func actionPrimary() { #expect(NSColor.Semantic.actionPrimary === NSColor.Base.lavender500) }
+    func actionPrimary() {
+        #expect(NSColor.Semantic.actionPrimary === NSColor.Base.lavender500)
+    }
 
     @Test("backgroundTertiary ссылается на neutral100")
     func backgroundTertiary() {
@@ -44,24 +47,36 @@ struct SemanticColorTests {
     // MARK: - Cards
 
     @Test("cardLavender ссылается на lavender50")
-    func cardLavender() { #expect(NSColor.Semantic.cardLavender === NSColor.Base.lavender50) }
+    func cardLavender() {
+        #expect(NSColor.Semantic.cardLavender === NSColor.Base.lavender50)
+    }
 
     @Test("cardBorderLavender ссылается на lavender200")
-    func cardBorderLavender() { #expect(NSColor.Semantic.cardBorderLavender === NSColor.Base.lavender200) }
+    func cardBorderLavender() {
+        #expect(NSColor.Semantic.cardBorderLavender === NSColor.Base.lavender200)
+    }
 
     // MARK: - Text
 
     @Test("textSecondary ссылается на neutral500")
-    func textSecondary() { #expect(NSColor.Semantic.textSecondary === NSColor.Base.neutral500) }
+    func textSecondary() {
+        #expect(NSColor.Semantic.textSecondary === NSColor.Base.neutral500)
+    }
 
     @Test("textAccent ссылается на lavender500")
-    func textAccent() { #expect(NSColor.Semantic.textAccent === NSColor.Base.lavender500) }
+    func textAccent() {
+        #expect(NSColor.Semantic.textAccent === NSColor.Base.lavender500)
+    }
 
     // MARK: - Actions
 
     @Test("actionSuccess ссылается на mint500")
-    func actionSuccess() { #expect(NSColor.Semantic.actionSuccess === NSColor.Base.mint500) }
+    func actionSuccess() {
+        #expect(NSColor.Semantic.actionSuccess === NSColor.Base.mint500)
+    }
 
     @Test("actionDanger ссылается на rose500")
-    func actionDanger() { #expect(NSColor.Semantic.actionDanger === NSColor.Base.rose500) }
+    func actionDanger() {
+        #expect(NSColor.Semantic.actionDanger === NSColor.Base.rose500)
+    }
 }

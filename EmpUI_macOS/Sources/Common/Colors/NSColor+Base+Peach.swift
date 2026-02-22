@@ -1,7 +1,6 @@
 import AppKit
 
 public extension NSColor.Base {
-
     static let peach50 = NSColor(name: nil) { $0.isDark ? NSColor(hex: 0x2E2519) : NSColor(hex: 0xFFF7EC) }
     static let peach100 = NSColor(name: nil) { $0.isDark ? NSColor(hex: 0x3E3223) : NSColor(hex: 0xFFECD3) }
     static let peach200 = NSColor(name: nil) { $0.isDark ? NSColor(hex: 0x5C482F) : NSColor(hex: 0xFFDBB4) }

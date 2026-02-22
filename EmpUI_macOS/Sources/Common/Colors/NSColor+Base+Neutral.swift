@@ -1,7 +1,6 @@
 import AppKit
 
 public extension NSColor.Base {
-
     static let neutral50 = NSColor(name: nil) { $0.isDark ? NSColor(hex: 0x171717) : NSColor(hex: 0xFAFAFA) }
     static let neutral100 = NSColor(name: nil) { $0.isDark ? NSColor(hex: 0x262626) : NSColor(hex: 0xF5F5F5) }
     static let neutral200 = NSColor(name: nil) { $0.isDark ? NSColor(hex: 0x404040) : NSColor(hex: 0xE5E5E5) }

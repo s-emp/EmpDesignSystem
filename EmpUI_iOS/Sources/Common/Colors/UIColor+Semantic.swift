@@ -1,12 +1,12 @@
 import UIKit
 
-public extension UIColor {
+// MARK: - UIColor.Semantic
 
-    enum Semantic {}
+public extension UIColor {
+    enum Semantic { }
 }
 
 public extension UIColor.Semantic {
-
     // MARK: - Backgrounds
 
     static let backgroundPrimary = UIColor { $0.userInterfaceStyle == .dark ? UIColor(hex: 0x0A0A0A) : .white }

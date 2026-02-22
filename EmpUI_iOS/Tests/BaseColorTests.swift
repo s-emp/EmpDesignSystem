@@ -16,7 +16,6 @@ private func resolvedHex(_ color: UIColor, style: UIUserInterfaceStyle) -> UInt3
 
 @Suite("UIColor.Base — Lavender")
 struct BaseLavenderTests {
-
     @Test("Lavender light mode", arguments: [
         (UIColor.Base.lavender50, UInt32(0xF0F1FF)),
         (UIColor.Base.lavender100, UInt32(0xE2E3FF)),
@@ -44,7 +43,6 @@ struct BaseLavenderTests {
 
 @Suite("UIColor.Base — Mint")
 struct BaseMintTests {
-
     @Test("Mint light mode", arguments: [
         (UIColor.Base.mint50, UInt32(0xEDFCF8)),
         (UIColor.Base.mint100, UInt32(0xD4F5EA)),
@@ -72,7 +70,6 @@ struct BaseMintTests {
 
 @Suite("UIColor.Base — Peach")
 struct BasePeachTests {
-
     @Test("Peach light mode", arguments: [
         (UIColor.Base.peach50, UInt32(0xFFF7EC)),
         (UIColor.Base.peach100, UInt32(0xFFECD3)),
@@ -100,7 +97,6 @@ struct BasePeachTests {
 
 @Suite("UIColor.Base — Rose")
 struct BaseRoseTests {
-
     @Test("Rose light mode", arguments: [
         (UIColor.Base.rose50, UInt32(0xFFF0F1)),
         (UIColor.Base.rose100, UInt32(0xFFDEE2)),
@@ -128,7 +124,6 @@ struct BaseRoseTests {
 
 @Suite("UIColor.Base — Sky")
 struct BaseSkyTests {
-
     @Test("Sky light mode", arguments: [
         (UIColor.Base.sky50, UInt32(0xEDF6FF)),
         (UIColor.Base.sky100, UInt32(0xDAEDFF)),
@@ -156,7 +151,6 @@ struct BaseSkyTests {
 
 @Suite("UIColor.Base — Lemon")
 struct BaseLemonTests {
-
     @Test("Lemon light mode", arguments: [
         (UIColor.Base.lemon50, UInt32(0xFFFCEB)),
         (UIColor.Base.lemon100, UInt32(0xFFF5CC)),
@@ -184,7 +178,6 @@ struct BaseLemonTests {
 
 @Suite("UIColor.Base — Lilac")
 struct BaseLilacTests {
-
     @Test("Lilac light mode", arguments: [
         (UIColor.Base.lilac50, UInt32(0xF8F0FF)),
         (UIColor.Base.lilac100, UInt32(0xEEDDFF)),
@@ -212,7 +205,6 @@ struct BaseLilacTests {
 
 @Suite("UIColor.Base — Neutral")
 struct BaseNeutralTests {
-
     @Test("Neutral light mode", arguments: [
         (UIColor.Base.neutral50, UInt32(0xFAFAFA)),
         (UIColor.Base.neutral100, UInt32(0xF5F5F5)),

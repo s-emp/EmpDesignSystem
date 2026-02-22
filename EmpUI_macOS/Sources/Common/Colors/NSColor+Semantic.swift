@@ -1,12 +1,12 @@
 import AppKit
 
-public extension NSColor {
+// MARK: - NSColor.Semantic
 
-    enum Semantic {}
+public extension NSColor {
+    enum Semantic { }
 }
 
 public extension NSColor.Semantic {
-
     // MARK: - Backgrounds
 
     static let backgroundPrimary = NSColor(name: nil) { $0.isDark ? NSColor(hex: 0x0A0A0A) : .white }

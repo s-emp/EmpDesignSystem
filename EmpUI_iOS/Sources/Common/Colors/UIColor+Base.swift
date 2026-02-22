@@ -1,6 +1,5 @@
 import UIKit
 
 public extension UIColor {
-
-    enum Base {}
+    enum Base { }
 }

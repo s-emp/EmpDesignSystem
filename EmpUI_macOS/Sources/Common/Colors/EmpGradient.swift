@@ -1,7 +1,6 @@
 import AppKit
 
 public struct EmpGradient: Equatable {
-
     public let startColor: NSColor
     public let endColor: NSColor
 

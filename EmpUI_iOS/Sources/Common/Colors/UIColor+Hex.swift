@@ -1,7 +1,6 @@
 import UIKit
 
 extension UIColor {
-
     convenience init(hex: UInt32) {
         self.init(
             red: CGFloat((hex >> 16) & 0xFF) / 255,

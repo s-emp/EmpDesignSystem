@@ -1,7 +1,6 @@
 import AppKit
 
 extension NSColor {
-
     convenience init(hex: UInt32) {
         let r = CGFloat((hex >> 16) & 0xFF) / 255.0
         let g = CGFloat((hex >> 8) & 0xFF) / 255.0

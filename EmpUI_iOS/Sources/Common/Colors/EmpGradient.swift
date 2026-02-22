@@ -1,7 +1,6 @@
 import UIKit
 
 public struct EmpGradient: Equatable {
-
     public let startColor: UIColor
     public let endColor: UIColor
 
@@ -11,7 +10,9 @@ public struct EmpGradient: Equatable {
     }
 
     public func resolvedColors(for traitCollection: UITraitCollection) -> (start: CGColor, end: CGColor) {
-        (startColor.resolvedColor(with: traitCollection).cgColor,
-         endColor.resolvedColor(with: traitCollection).cgColor)
+        (
+            startColor.resolvedColor(with: traitCollection).cgColor,
+            endColor.resolvedColor(with: traitCollection).cgColor
+        )
     }
 }
