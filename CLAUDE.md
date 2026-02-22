@@ -78,6 +78,15 @@ mise exec -- tuist test EmpUI_iOS
 
 # Note: `tuist build`/`tuist test` takes scheme as positional argument, NOT --scheme flag
 # Note: Test targets don't have their own schemes — use framework scheme (EmpUI_macOS, EmpUI_iOS)
+
+# Lint (SwiftLint)
+swiftlint
+
+# Lint + autocorrect
+swiftlint --fix
+
+# Format (SwiftFormat)
+swiftformat .
 ```
 
 ## File Organization

@@ -1,8 +1,7 @@
 import AppKit
 
-extension CommonViewModel {
-
-    public struct Corners: Equatable {
+public extension CommonViewModel {
+    struct Corners: Equatable {
         public let radius: CGFloat
         public let maskedCorners: CACornerMask
 

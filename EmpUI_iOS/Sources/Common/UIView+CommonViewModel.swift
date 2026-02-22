@@ -1,7 +1,6 @@
 import UIKit
 
 extension UIView {
-
     func apply(common viewModel: CommonViewModel) {
         // Background
         backgroundColor = viewModel.backgroundColor

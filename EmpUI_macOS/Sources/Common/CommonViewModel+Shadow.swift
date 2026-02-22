@@ -1,8 +1,7 @@
 import AppKit
 
-extension CommonViewModel {
-
-    public struct Shadow: Equatable {
+public extension CommonViewModel {
+    struct Shadow: Equatable {
         public let color: NSColor
         public let offset: CGSize
         public let radius: CGFloat

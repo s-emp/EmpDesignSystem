@@ -1,7 +1,6 @@
 import AppKit
 
 extension NSView {
-
     func apply(common viewModel: CommonViewModel) {
         wantsLayer = true
         guard let layer = layer else { return }
@@ -77,7 +76,12 @@ extension NSView {
             (objc_getAssociatedObject(self, &NSView.layoutMarginsInsetsKey) as? NSValue)?.edgeInsetsValue ?? NSEdgeInsets()
         }
         set {
-            objc_setAssociatedObject(self, &NSView.layoutMarginsInsetsKey, NSValue(edgeInsets: newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(
+                self,
+                &NSView.layoutMarginsInsetsKey,
+                NSValue(edgeInsets: newValue),
+                .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+            )
 
             // Trigger guide creation if needed
             _ = empLayoutMarginsGuide

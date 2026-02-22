@@ -1,7 +1,6 @@
 import UIKit
 
 public final class EmpButton: UIView {
-
     // MARK: - ViewModel
 
     public struct ViewModel {
@@ -37,7 +36,7 @@ public final class EmpButton: UIView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 

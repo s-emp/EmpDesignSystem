@@ -1,8 +1,7 @@
 import UIKit
 
-extension CommonViewModel {
-
-    public struct Border: Equatable {
+public extension CommonViewModel {
+    struct Border: Equatable {
         public let width: CGFloat
         public let color: UIColor
         public let style: Style

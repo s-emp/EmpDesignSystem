@@ -1,7 +1,6 @@
 import UIKit
 
 public struct CommonViewModel: Equatable {
-
     // MARK: - Properties
 
     public let border: Border
