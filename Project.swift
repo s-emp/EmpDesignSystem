@@ -40,6 +40,28 @@ let project = Project(
         // MARK: - Tests
 
         .target(
+            name: "EmpUI_iOSTests",
+            destinations: .iOS,
+            product: .unitTests,
+            bundleId: "dev.emp.EmpUI-iOSTests",
+            sources: ["EmpUI_iOS/Tests/**"],
+            dependencies: [
+                .target(name: "EmpUI_iOS"),
+                .external(name: "SnapshotTesting"),
+            ]
+        ),
+        .target(
+            name: "EmpUI_macOSTests",
+            destinations: .macOS,
+            product: .unitTests,
+            bundleId: "dev.emp.EmpUI-macOSTests",
+            sources: ["EmpUI_macOS/Tests/**"],
+            dependencies: [
+                .target(name: "EmpUI_macOS"),
+                .external(name: "SnapshotTesting"),
+            ]
+        ),
+        .target(
             name: "EmpDesignSystemTests",
             destinations: .macOS,
             product: .unitTests,
