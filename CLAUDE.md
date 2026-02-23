@@ -216,6 +216,14 @@ These diagnostics appear before `tuist generate` and are **not real errors**:
 - `Cannot find type 'X' in scope` in `+NestedType.swift` extension files — same-module references resolve after generation
 - `Cannot find 'ComponentName' in scope` in Preview files — same-module references resolve after generation
 
+## SPM Distribution
+
+This project is distributed as a Swift Package via `Package.swift` at the root. Two library products:
+- `EmpUI_iOS` — iOS framework
+- `EmpUI_macOS` — macOS framework
+
+Consumer integration guide and full API reference are in `README.md`.
+
 ## Design Docs
 
 Implementation plans and design documents are in `docs/plans/`.

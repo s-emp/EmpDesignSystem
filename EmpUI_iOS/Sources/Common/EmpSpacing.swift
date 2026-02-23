@@ -1,6 +1,6 @@
 import CoreGraphics
 
-public enum EmpSpacing: CGFloat {
+public enum EmpSpacing: CGFloat, Sendable {
     case xxs = 4
     case xs = 8
     case s = 12

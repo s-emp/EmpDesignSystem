@@ -1,6 +1,6 @@
 import UIKit
 
-public struct EmpGradient: Equatable {
+public struct EmpGradient: Equatable, @unchecked Sendable {
     public let startColor: UIColor
     public let endColor: UIColor
 

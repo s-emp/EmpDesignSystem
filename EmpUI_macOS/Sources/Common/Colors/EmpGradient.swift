@@ -1,6 +1,6 @@
 import AppKit
 
-public struct EmpGradient: Equatable {
+public struct EmpGradient: Equatable, @unchecked Sendable {
     public let startColor: NSColor
     public let endColor: NSColor
 
