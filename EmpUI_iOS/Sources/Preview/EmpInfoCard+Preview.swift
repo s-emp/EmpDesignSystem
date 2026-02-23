@@ -4,19 +4,7 @@ import UIKit
 @available(iOS 17.0, *)
 #Preview("EmpInfoCard — Default") {
     let card = EmpInfoCard()
-    let _ = card.configure(with: .init(
-        common: CommonViewModel(
-            corners: .init(radius: 12),
-            layoutMargins: UIEdgeInsets(
-                top: EmpSpacing.m.rawValue,
-                left: EmpSpacing.m.rawValue,
-                bottom: EmpSpacing.m.rawValue,
-                right: EmpSpacing.m.rawValue
-            )
-        ),
-        subtitle: "Total Time",
-        value: "12h 15m"
-    ))
+    let _ = card.configure(with: EmpInfoCard.Preset.default(subtitle: "Total Time", value: "12h 15m"))
     card
 }
 
@@ -43,21 +31,10 @@ import UIKit
 @available(iOS 17.0, *)
 #Preview("EmpInfoCard — Gradient") {
     let card = EmpInfoCard()
-    let _ = card.configure(with: .init(
-        common: CommonViewModel(
-            corners: .init(radius: 12),
-            layoutMargins: UIEdgeInsets(
-                top: EmpSpacing.m.rawValue,
-                left: EmpSpacing.m.rawValue,
-                bottom: EmpSpacing.m.rawValue,
-                right: EmpSpacing.m.rawValue
-            )
-        ),
+    let _ = card.configure(with: EmpInfoCard.Preset.gradient(
         subtitle: "Longest Session",
         value: "1h 47m",
-        subtitleColor: .white.withAlphaComponent(0.7),
-        valueColor: .white,
-        background: .gradient(EmpGradient.Preset.lavenderToSky)
+        gradient: .Preset.lavenderToSky
     ))
     card
 }
@@ -65,18 +42,6 @@ import UIKit
 @available(iOS 17.0, *)
 #Preview("EmpInfoCard — Large Value") {
     let card = EmpInfoCard()
-    let _ = card.configure(with: .init(
-        common: CommonViewModel(
-            corners: .init(radius: 12),
-            layoutMargins: UIEdgeInsets(
-                top: EmpSpacing.m.rawValue,
-                left: EmpSpacing.m.rawValue,
-                bottom: EmpSpacing.m.rawValue,
-                right: EmpSpacing.m.rawValue
-            )
-        ),
-        subtitle: "Apps Used",
-        value: "10"
-    ))
+    let _ = card.configure(with: EmpInfoCard.Preset.default(subtitle: "Apps Used", value: "10"))
     card
 }

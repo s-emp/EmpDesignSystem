@@ -71,3 +71,47 @@ struct EmpInfoCardBackgroundTests {
         }
     }
 }
+
+// MARK: - Preset
+
+@Suite("EmpInfoCard.Preset")
+struct EmpInfoCardPresetTests {
+    @Test("default — задаёт дефолтные цвета и backgroundSecondary")
+    func defaultPreset() {
+        let sut = EmpInfoCard.Preset.default(subtitle: "Total Time", value: "12h 15m")
+
+        #expect(sut.subtitle == "Total Time")
+        #expect(sut.value == "12h 15m")
+        #expect(sut.subtitleColor == NSColor.Semantic.textSecondary)
+        #expect(sut.valueColor == NSColor.Semantic.textPrimary)
+        #expect(sut.common.corners.radius == 12)
+        #expect(sut.common.layoutMargins == NSEdgeInsets(
+            top: EmpSpacing.m.rawValue,
+            left: EmpSpacing.m.rawValue,
+            bottom: EmpSpacing.m.rawValue,
+            right: EmpSpacing.m.rawValue
+        ))
+        if case let .color(color) = sut.background {
+            #expect(color == NSColor.Semantic.backgroundSecondary)
+        } else {
+            Issue.record("Ожидался .color, получен .gradient")
+        }
+    }
+
+    @Test("gradient — задаёт белый текст и градиентный фон")
+    func gradientPreset() {
+        let gradient = EmpGradient.Preset.lavenderToSky
+        let sut = EmpInfoCard.Preset.gradient(subtitle: "Session", value: "1h 47m", gradient: gradient)
+
+        #expect(sut.subtitle == "Session")
+        #expect(sut.value == "1h 47m")
+        #expect(sut.subtitleColor == .white.withAlphaComponent(0.7))
+        #expect(sut.valueColor == .white)
+        #expect(sut.common.corners.radius == 12)
+        if case let .gradient(stored) = sut.background {
+            #expect(stored == gradient)
+        } else {
+            Issue.record("Ожидался .gradient, получен .color")
+        }
+    }
+}
