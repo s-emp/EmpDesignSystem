@@ -10,7 +10,9 @@ struct EmpButtonViewModelTests {
     func storesFields() {
         let common = ControlParameter(normal: CommonViewModel())
         let content = ControlParameter(normal: EmpButton.Content(
-            center: .text("Test", color: .white, font: .systemFont(ofSize: 13))
+            center: .text(EmpText.ViewModel(
+                content: .plain(.init(text: "Test", font: .systemFont(ofSize: 13), color: .white))
+            ))
         ))
 
         let sut = EmpButton.ViewModel(
@@ -42,11 +44,12 @@ struct EmpButtonContentTests {
     @Test("Element.icon сохраняет параметры")
     func iconElement() throws {
         let image = try #require(NSImage(systemSymbolName: "star", accessibilityDescription: nil))
-        let element = EmpButton.Content.Element.icon(image, color: .red, size: 16)
+        let viewModel = EmpImage.ViewModel(image: image, tintColor: .red, size: CGSize(width: 16, height: 16))
+        let element = EmpButton.Content.Element.icon(viewModel)
 
-        if case let .icon(_, color, size) = element {
-            #expect(color == .red)
-            #expect(size == 16)
+        if case let .icon(vm) = element {
+            #expect(vm.tintColor == .red)
+            #expect(vm.size == CGSize(width: 16, height: 16))
         } else {
             Issue.record("Должен быть .icon")
         }
@@ -55,12 +58,19 @@ struct EmpButtonContentTests {
     @Test("Element.text сохраняет параметры")
     func textElement() {
         let font = NSFont.systemFont(ofSize: 14)
-        let element = EmpButton.Content.Element.text("Hello", color: .blue, font: font)
+        let viewModel = EmpText.ViewModel(
+            content: .plain(.init(text: "Hello", font: font, color: .blue))
+        )
+        let element = EmpButton.Content.Element.text(viewModel)
 
-        if case let .text(string, color, f) = element {
-            #expect(string == "Hello")
-            #expect(color == .blue)
-            #expect(f == font)
+        if case let .text(vm) = element {
+            if case let .plain(plain) = vm.content {
+                #expect(plain.text == "Hello")
+                #expect(plain.color == .blue)
+                #expect(plain.font == font)
+            } else {
+                Issue.record("Должен быть .plain")
+            }
         } else {
             Issue.record("Должен быть .text")
         }
@@ -68,20 +78,23 @@ struct EmpButtonContentTests {
 
     @Test("Element.titleSubtitle сохраняет параметры")
     func titleSubtitleElement() {
-        let element = EmpButton.Content.Element.titleSubtitle(
-            title: "Title",
-            subtitle: "Sub",
-            titleColor: .white,
-            subtitleColor: .gray,
-            titleFont: .systemFont(ofSize: 13),
-            subtitleFont: .systemFont(ofSize: 11)
+        let titleVM = EmpText.ViewModel(
+            content: .plain(.init(text: "Title", font: .systemFont(ofSize: 13), color: .white))
         )
+        let subtitleVM = EmpText.ViewModel(
+            content: .plain(.init(text: "Sub", font: .systemFont(ofSize: 11), color: .gray))
+        )
+        let element = EmpButton.Content.Element.titleSubtitle(title: titleVM, subtitle: subtitleVM)
 
-        if case let .titleSubtitle(title, subtitle, tc, sc, _, _) = element {
-            #expect(title == "Title")
-            #expect(subtitle == "Sub")
-            #expect(tc == .white)
-            #expect(sc == .gray)
+        if case let .titleSubtitle(title, subtitle) = element {
+            if case let .plain(titlePlain) = title.content {
+                #expect(titlePlain.text == "Title")
+                #expect(titlePlain.color == .white)
+            }
+            if case let .plain(subtitlePlain) = subtitle.content {
+                #expect(subtitlePlain.text == "Sub")
+                #expect(subtitlePlain.color == .gray)
+            }
         } else {
             Issue.record("Должен быть .titleSubtitle")
         }
@@ -101,8 +114,9 @@ struct EmpButtonPresetTests {
         #expect(sut.common.normal.backgroundColor == NSColor.Semantic.actionPrimary)
         #expect(sut.common.hover.backgroundColor == NSColor.Semantic.actionPrimaryHover)
 
-        if case let .text(_, color, _) = sut.content.normal.center {
-            #expect(color == NSColor.Semantic.textPrimaryInverted)
+        if case let .text(vm) = sut.content.normal.center,
+           case let .plain(plain) = vm.content {
+            #expect(plain.color == NSColor.Semantic.textPrimaryInverted)
         }
     }
 
@@ -113,8 +127,9 @@ struct EmpButtonPresetTests {
         #expect(sut.common.normal.backgroundColor == NSColor.Semantic.actionPrimaryBase)
         #expect(sut.common.hover.backgroundColor == NSColor.Semantic.actionPrimaryBaseHover)
 
-        if case let .text(_, color, _) = sut.content.normal.center {
-            #expect(color == NSColor.Semantic.textPrimary)
+        if case let .text(vm) = sut.content.normal.center,
+           case let .plain(plain) = vm.content {
+            #expect(plain.color == NSColor.Semantic.textPrimary)
         }
     }
 
@@ -127,8 +142,9 @@ struct EmpButtonPresetTests {
         #expect(sut.common.normal.backgroundColor == .clear)
         #expect(sut.common.hover.backgroundColor == NSColor.Semantic.actionPrimaryTint)
 
-        if case let .text(_, color, _) = sut.content.normal.center {
-            #expect(color == NSColor.Semantic.actionPrimary)
+        if case let .text(vm) = sut.content.normal.center,
+           case let .plain(plain) = vm.content {
+            #expect(plain.color == NSColor.Semantic.actionPrimary)
         }
     }
 
@@ -140,8 +156,9 @@ struct EmpButtonPresetTests {
         #expect(sut.common.normal.border.width == 0)
         #expect(sut.common.hover.backgroundColor == NSColor.Semantic.actionPrimaryTint)
 
-        if case let .text(_, color, _) = sut.content.normal.center {
-            #expect(color == NSColor.Semantic.textPrimary)
+        if case let .text(vm) = sut.content.normal.center,
+           case let .plain(plain) = vm.content {
+            #expect(plain.color == NSColor.Semantic.textPrimary)
         }
     }
 
@@ -159,8 +176,9 @@ struct EmpButtonPresetTests {
 
         #expect(sut.common.normal.backgroundColor == NSColor.Semantic.actionDangerBase)
 
-        if case let .text(_, color, _) = sut.content.normal.center {
-            #expect(color == NSColor.Semantic.actionDanger)
+        if case let .text(vm) = sut.content.normal.center,
+           case let .plain(plain) = vm.content {
+            #expect(plain.color == NSColor.Semantic.actionDanger)
         }
     }
 
@@ -170,8 +188,9 @@ struct EmpButtonPresetTests {
 
         #expect(sut.common.normal.border.color == NSColor.Semantic.actionDanger)
 
-        if case let .text(_, color, _) = sut.content.normal.center {
-            #expect(color == NSColor.Semantic.actionDanger)
+        if case let .text(vm) = sut.content.normal.center,
+           case let .plain(plain) = vm.content {
+            #expect(plain.color == NSColor.Semantic.actionDanger)
         }
     }
 
@@ -201,11 +220,12 @@ struct EmpButtonPresetTests {
         )
         let sut = EmpButton.Preset.filled(.primary, content: iconLayout, size: .large)
 
-        if case let .icon(_, _, size) = sut.content.normal.leading {
-            #expect(size == 16)
+        if case let .icon(vm) = sut.content.normal.leading {
+            #expect(vm.size == CGSize(width: 16, height: 16))
         }
-        if case let .text(_, _, font) = sut.content.normal.center {
-            #expect(font == .systemFont(ofSize: 14, weight: .semibold))
+        if case let .text(vm) = sut.content.normal.center,
+           case let .plain(plain) = vm.content {
+            #expect(plain.font == .systemFont(ofSize: 14, weight: .semibold))
         }
     }
 }

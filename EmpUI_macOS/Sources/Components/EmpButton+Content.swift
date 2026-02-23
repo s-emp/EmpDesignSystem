@@ -16,19 +16,10 @@ public extension EmpButton {
             self.trailing = trailing
         }
 
-        // swiftlint:disable enum_case_associated_values_count
         public enum Element {
-            case icon(NSImage, color: NSColor, size: CGFloat)
-            case text(String, color: NSColor, font: NSFont)
-            case titleSubtitle(
-                title: String,
-                subtitle: String,
-                titleColor: NSColor,
-                subtitleColor: NSColor,
-                titleFont: NSFont,
-                subtitleFont: NSFont
-            )
+            case text(EmpText.ViewModel)
+            case icon(EmpImage.ViewModel)
+            case titleSubtitle(title: EmpText.ViewModel, subtitle: EmpText.ViewModel)
         }
-        // swiftlint:enable enum_case_associated_values_count
     }
 }

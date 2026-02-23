@@ -112,44 +112,30 @@ public final class EmpButton: UIView {
 
     private func makeElementView(_ element: Content.Element) -> UIView {
         switch element {
-        case let .icon(image, color, size):
-            let imageView = UIImageView()
-            imageView.image = image.withRenderingMode(.alwaysTemplate)
-            imageView.tintColor = color
-            imageView.contentMode = .scaleAspectFit
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                imageView.widthAnchor.constraint(equalToConstant: size),
-                imageView.heightAnchor.constraint(equalToConstant: size),
-            ])
-            return imageView
+        case let .text(viewModel):
+            let empText = EmpText()
+            empText.configure(with: viewModel)
+            return empText
 
-        case let .text(string, color, font):
-            let label = UILabel()
-            label.text = string
-            label.font = font
-            label.textColor = color
-            label.lineBreakMode = .byTruncatingTail
-            return label
+        case let .icon(viewModel):
+            let empImage = EmpImage()
+            empImage.configure(with: viewModel)
+            return empImage
 
-        case let .titleSubtitle(title, subtitle, titleColor, subtitleColor, titleFont, subtitleFont):
+        case let .titleSubtitle(titleVM, subtitleVM):
             let stack = UIStackView()
             stack.axis = .vertical
             stack.alignment = .leading
             stack.spacing = 2
 
-            let titleLabel = UILabel()
-            titleLabel.text = title
-            titleLabel.font = titleFont
-            titleLabel.textColor = titleColor
+            let titleText = EmpText()
+            titleText.configure(with: titleVM)
 
-            let subtitleLabel = UILabel()
-            subtitleLabel.text = subtitle
-            subtitleLabel.font = subtitleFont
-            subtitleLabel.textColor = subtitleColor
+            let subtitleText = EmpText()
+            subtitleText.configure(with: subtitleVM)
 
-            stack.addArrangedSubview(titleLabel)
-            stack.addArrangedSubview(subtitleLabel)
+            stack.addArrangedSubview(titleText)
+            stack.addArrangedSubview(subtitleText)
             return stack
         }
     }
@@ -164,25 +150,17 @@ public final class EmpButton: UIView {
 
         for (view, element) in zip(contentStack.arrangedSubviews, elements) {
             switch element {
-            case let .icon(_, color, _):
-                (view as? UIImageView)?.tintColor = color
+            case let .text(viewModel):
+                (view as? EmpText)?.configure(with: viewModel)
 
-            case let .text(_, color, font):
-                if let label = view as? UILabel {
-                    label.textColor = color
-                    label.font = font
-                }
+            case let .icon(viewModel):
+                (view as? EmpImage)?.configure(with: viewModel)
 
-            case let .titleSubtitle(_, _, titleColor, subtitleColor, titleFont, subtitleFont):
+            case let .titleSubtitle(titleVM, subtitleVM):
                 if let stack = view as? UIStackView {
-                    if let title = stack.arrangedSubviews.first as? UILabel {
-                        title.textColor = titleColor
-                        title.font = titleFont
-                    }
-                    if stack.arrangedSubviews.count > 1,
-                       let subtitle = stack.arrangedSubviews[1] as? UILabel {
-                        subtitle.textColor = subtitleColor
-                        subtitle.font = subtitleFont
+                    (stack.arrangedSubviews.first as? EmpText)?.configure(with: titleVM)
+                    if stack.arrangedSubviews.count > 1, let subtitle = stack.arrangedSubviews[1] as? EmpText {
+                        subtitle.configure(with: subtitleVM)
                     }
                 }
             }

@@ -12,6 +12,10 @@ public final class EmpText: NSView {
         return field
     }()
 
+    // MARK: - State
+
+    private var configuredNumberOfLines: Int = 0
+
     // MARK: - Init
 
     override public init(frame frameRect: NSRect) {
@@ -44,21 +48,7 @@ public final class EmpText: NSView {
     public func configure(with viewModel: ViewModel) {
         apply(common: viewModel.common)
 
-        textField.maximumNumberOfLines = viewModel.numberOfLines
         textField.alignment = viewModel.alignment
-
-        textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-
-        if viewModel.numberOfLines == 1 {
-            textField.cell?.wraps = false
-            textField.cell?.isScrollable = false
-            textField.cell?.lineBreakMode = .byTruncatingTail
-            textField.cell?.truncatesLastVisibleLine = true
-        } else {
-            textField.cell?.wraps = true
-            textField.cell?.isScrollable = false
-            textField.cell?.lineBreakMode = .byWordWrapping
-        }
 
         switch viewModel.content {
         case let .plain(plainText):
@@ -69,13 +59,47 @@ public final class EmpText: NSView {
         case let .attributed(attributedString):
             textField.attributedStringValue = attributedString
         }
+
+        configuredNumberOfLines = viewModel.numberOfLines
+        textField.maximumNumberOfLines = viewModel.numberOfLines
+
+        textField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+        if viewModel.numberOfLines == 1 {
+            textField.cell?.wraps = false
+            textField.cell?.isScrollable = false
+        } else {
+            textField.cell?.wraps = true
+            textField.cell?.isScrollable = false
+            textField.cell?.lineBreakMode = .byWordWrapping
+        }
+
+        invalidateIntrinsicContentSize()
+    }
+
+    // MARK: - Intrinsic Content Size
+
+    override public var intrinsicContentSize: NSSize {
+        let textSize = textField.intrinsicContentSize
+        let margins = empLayoutMargins
+        let noMetric = NSView.noIntrinsicMetric
+        return NSSize(
+            width: textSize.width == noMetric ? noMetric : textSize.width + margins.left + margins.right,
+            height: textSize.height == noMetric ? noMetric : textSize.height + margins.top + margins.bottom
+        )
     }
 
     // MARK: - Layout
 
     override public func layout() {
         super.layout()
-        if textField.maximumNumberOfLines != 1 {
+        if configuredNumberOfLines == 1 {
+            let textWidth = textField.attributedStringValue.size().width
+            if textField.frame.width < textWidth {
+                textField.cell?.lineBreakMode = .byTruncatingTail
+                textField.cell?.truncatesLastVisibleLine = true
+            }
+        } else {
             textField.preferredMaxLayoutWidth = textField.frame.width
         }
     }

@@ -53,5 +53,19 @@ public final class EmpText: UIView {
         case let .attributed(attributedString):
             label.attributedText = attributedString
         }
+
+        invalidateIntrinsicContentSize()
+    }
+
+    // MARK: - Layout
+
+    override public var intrinsicContentSize: CGSize {
+        let labelSize = label.intrinsicContentSize
+        let margins = layoutMargins
+        let noMetric = UIView.noIntrinsicMetric
+        return CGSize(
+            width: labelSize.width == noMetric ? noMetric : labelSize.width + margins.left + margins.right,
+            height: labelSize.height == noMetric ? noMetric : labelSize.height + margins.top + margins.bottom
+        )
     }
 }

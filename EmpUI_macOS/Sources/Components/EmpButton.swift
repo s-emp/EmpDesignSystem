@@ -119,44 +119,34 @@ public final class EmpButton: NSView {
 
     private func makeElementView(_ element: Content.Element) -> NSView {
         switch element {
-        case let .icon(image, color, size):
-            let imageView = NSImageView()
-            imageView.image = image
-            imageView.contentTintColor = color
-            imageView.imageScaling = .scaleProportionallyUpOrDown
-            imageView.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                imageView.widthAnchor.constraint(equalToConstant: size),
-                imageView.heightAnchor.constraint(equalToConstant: size),
-            ])
-            return imageView
-
-        case let .text(string, color, font):
-            let label = NSTextField(labelWithString: string)
-            label.font = font
-            label.textColor = color
-            label.setContentCompressionResistancePriority(
+        case let .text(viewModel):
+            let empText = EmpText()
+            empText.configure(with: viewModel)
+            empText.setContentCompressionResistancePriority(
                 NSLayoutConstraint.Priority(rawValue: 999),
                 for: .horizontal
             )
-            return label
+            return empText
 
-        case let .titleSubtitle(title, subtitle, titleColor, subtitleColor, titleFont, subtitleFont):
+        case let .icon(viewModel):
+            let empImage = EmpImage()
+            empImage.configure(with: viewModel)
+            return empImage
+
+        case let .titleSubtitle(titleVM, subtitleVM):
             let stack = NSStackView()
             stack.orientation = .vertical
             stack.alignment = .leading
             stack.spacing = 2
 
-            let titleLabel = NSTextField(labelWithString: title)
-            titleLabel.font = titleFont
-            titleLabel.textColor = titleColor
+            let titleText = EmpText()
+            titleText.configure(with: titleVM)
 
-            let subtitleLabel = NSTextField(labelWithString: subtitle)
-            subtitleLabel.font = subtitleFont
-            subtitleLabel.textColor = subtitleColor
+            let subtitleText = EmpText()
+            subtitleText.configure(with: subtitleVM)
 
-            stack.addArrangedSubview(titleLabel)
-            stack.addArrangedSubview(subtitleLabel)
+            stack.addArrangedSubview(titleText)
+            stack.addArrangedSubview(subtitleText)
             return stack
         }
     }
@@ -171,25 +161,17 @@ public final class EmpButton: NSView {
 
         for (view, element) in zip(contentStack.arrangedSubviews, elements) {
             switch element {
-            case let .icon(_, color, _):
-                (view as? NSImageView)?.contentTintColor = color
+            case let .text(viewModel):
+                (view as? EmpText)?.configure(with: viewModel)
 
-            case let .text(_, color, font):
-                if let label = view as? NSTextField {
-                    label.textColor = color
-                    label.font = font
-                }
+            case let .icon(viewModel):
+                (view as? EmpImage)?.configure(with: viewModel)
 
-            case let .titleSubtitle(_, _, titleColor, subtitleColor, titleFont, subtitleFont):
+            case let .titleSubtitle(titleVM, subtitleVM):
                 if let stack = view as? NSStackView {
-                    if let title = stack.arrangedSubviews.first as? NSTextField {
-                        title.textColor = titleColor
-                        title.font = titleFont
-                    }
-                    if stack.arrangedSubviews.count > 1,
-                       let subtitle = stack.arrangedSubviews[1] as? NSTextField {
-                        subtitle.textColor = subtitleColor
-                        subtitle.font = subtitleFont
+                    (stack.arrangedSubviews.first as? EmpText)?.configure(with: titleVM)
+                    if stack.arrangedSubviews.count > 1, let subtitle = stack.arrangedSubviews[1] as? EmpText {
+                        subtitle.configure(with: subtitleVM)
                     }
                 }
             }

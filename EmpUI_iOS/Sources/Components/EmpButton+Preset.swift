@@ -198,17 +198,41 @@ public extension EmpButton {
         ) -> Content.Element {
             switch element {
             case let .icon(image):
-                return .icon(image, color: primaryColor, size: config.iconSize)
+                return .icon(EmpImage.ViewModel(
+                    image: image,
+                    tintColor: primaryColor,
+                    size: CGSize(width: config.iconSize, height: config.iconSize),
+                    contentMode: .aspectFit
+                ))
             case let .text(string):
-                return .text(string, color: primaryColor, font: config.font)
+                return .text(EmpText.ViewModel(
+                    content: .plain(.init(
+                        text: string,
+                        font: config.font,
+                        color: primaryColor
+                    )),
+                    numberOfLines: 1
+                ))
             case let .titleSubtitle(title, subtitle):
                 return .titleSubtitle(
-                    title: title,
-                    subtitle: subtitle,
-                    titleColor: primaryColor,
-                    subtitleColor: secondaryColor,
-                    titleFont: config.font,
-                    subtitleFont: config.secondaryFont
+                    title: EmpText.ViewModel(
+                        content: .plain(.init(
+                            text: title,
+                            font: config.font,
+                            color: primaryColor
+                        )),
+                        numberOfLines: 1,
+                        alignment: .natural
+                    ),
+                    subtitle: EmpText.ViewModel(
+                        content: .plain(.init(
+                            text: subtitle,
+                            font: config.secondaryFont,
+                            color: secondaryColor
+                        )),
+                        numberOfLines: 1,
+                        alignment: .natural
+                    )
                 )
             }
         }
