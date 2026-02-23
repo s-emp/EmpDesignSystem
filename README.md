@@ -9,7 +9,7 @@ Reusable UI component library for iOS (UIKit) and macOS (AppKit).
 ```swift
 // Package.swift
 dependencies: [
-    .package(url: "https://github.com/s-emp/EmpDesignSystem.git", from: "1.0.0")
+    .package(url: "https://github.com/s-emp/EmpDesignSystem.git", from: "0.1.0")
 ]
 
 // Target dependency:
@@ -21,7 +21,7 @@ dependencies: [
 
 ```swift
 // Tuist/Package.swift
-.package(url: "https://github.com/s-emp/EmpDesignSystem.git", from: "1.0.0")
+.package(url: "https://github.com/s-emp/EmpDesignSystem.git", from: "0.1.0")
 
 // Project.swift target dependency:
 .external(name: "EmpUI_iOS")   // for iOS
