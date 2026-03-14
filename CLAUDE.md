@@ -31,13 +31,17 @@ Tuist/Package.swift        — External dependencies (swift-snapshot-testing)
 Tuist/Package.resolved     — Locked dependency versions (committed to git)
 EmpUI_iOS/Sources/         — iOS framework (UIKit)
   Common/                  — CommonViewModel, nested types (+Border/+Shadow/+Corners), UIView+CommonViewModel
-  Components/              — UI components
-  Preview/                 — #Preview files
+  Components/              — UI components, each in its own folder
+    EmpButton/             — EmpButton + ViewModel, Content, Preset, Preview
+    EmpImage/              — EmpImage + Preview
+    EmpInfoCard/           — EmpInfoCard + ViewModel, Background, Preset, Preview
+    EmpProgressBar/        — EmpProgressBar + Preview
+    EmpSegmentControl/     — EmpSegmentControl + ViewModel, Preset, Preview
+    EmpText/               — EmpText + ViewModel, Content, Preview
 EmpUI_iOS/Tests/           — iOS framework tests
 EmpUI_macOS/Sources/       — macOS framework (AppKit)
   Common/                  — CommonViewModel, nested types, NSView+CommonViewModel, NSEdgeInsets+Equatable
-  Components/              — UI components
-  Preview/                 — #Preview files
+  Components/              — UI components, each in its own folder (same structure as iOS)
 EmpUI_macOS/Tests/         — macOS framework tests
 EmpDesignSystem/Sources/   — Sandbox macOS app (Hello World)
 EmpDesignSystem/Resources/ — App resources
@@ -102,7 +106,7 @@ Every component follows this structure:
 - Class inherits from `UIView` (iOS) or `NSView` (macOS)
 - Nested `ViewModel` struct inside the component
 - Public `configure(with viewModel: ViewModel)` method
-- Separate `+Preview.swift` file with `#Preview` macros and test data
+- `+Preview.swift` file with `#Preview` macros and test data (in the same component folder)
 
 ### iOS example
 
