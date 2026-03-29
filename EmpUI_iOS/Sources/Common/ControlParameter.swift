@@ -40,3 +40,12 @@ public struct ControlParameter<T> {
 }
 
 extension ControlParameter: Equatable where T: Equatable { }
+
+extension ControlParameter where T == ComponentDescriptor {
+    public var isStructurallyConsistent: Bool {
+        let fp = normal.fingerprint
+        return hover.fingerprint == fp
+            && highlighted.fingerprint == fp
+            && disabled.fingerprint == fp
+    }
+}

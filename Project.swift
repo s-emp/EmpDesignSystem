@@ -2,7 +2,11 @@ import ProjectDescription
 
 let project = Project(
     name: "EmpDesignSystem",
-    settings: .settings(base: ["SWIFT_VERSION": "6"]),
+    settings: .settings(base: [
+        "SWIFT_VERSION": "6",
+        "MACOSX_DEPLOYMENT_TARGET": "15.0",
+        "IPHONEOS_DEPLOYMENT_TARGET": "18.0",
+    ]),
     targets: [
         // MARK: - Frameworks
 

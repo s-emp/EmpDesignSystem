@@ -36,6 +36,48 @@ extension NSView {
 
         // Layout Margins
         empLayoutMargins = viewModel.layoutMargins
+
+        // Size
+        applySize(viewModel.size)
+    }
+
+    // MARK: - Size Helpers
+
+    private func applySize(_ size: SizeViewModel) {
+        applySizeDimension(size.width, for: NSLayoutConstraint.Orientation.horizontal)
+        applySizeDimension(size.height, for: NSLayoutConstraint.Orientation.vertical)
+    }
+
+    private func applySizeDimension(_ dimension: SizeDimension, for orientation: NSLayoutConstraint.Orientation) {
+        let attribute: NSLayoutConstraint.Attribute = orientation == .horizontal ? .width : .height
+        let identifierSuffix = orientation == .horizontal ? "0" : "1"
+
+        if let existing = constraints.first(where: {
+            $0.firstAttribute == attribute
+                && $0.secondItem == nil
+                && $0.identifier == "EDS.fixed.\(identifierSuffix)"
+        }) {
+            existing.isActive = false
+            removeConstraint(existing)
+        }
+
+        switch dimension {
+        case .hug:
+            setContentHuggingPriority(NSLayoutConstraint.Priority(751), for: orientation)
+            setContentCompressionResistancePriority(NSLayoutConstraint.Priority(752), for: orientation)
+        case .fill:
+            setContentHuggingPriority(NSLayoutConstraint.Priority(1), for: orientation)
+            setContentCompressionResistancePriority(NSLayoutConstraint.Priority(752), for: orientation)
+        case .fixed(let value):
+            setContentHuggingPriority(NSLayoutConstraint.Priority(751), for: orientation)
+            setContentCompressionResistancePriority(NSLayoutConstraint.Priority(752), for: orientation)
+            let constraint = orientation == .horizontal
+                ? widthAnchor.constraint(equalToConstant: value)
+                : heightAnchor.constraint(equalToConstant: value)
+            constraint.priority = NSLayoutConstraint.Priority(1000)
+            constraint.identifier = "EDS.fixed.\(identifierSuffix)"
+            constraint.isActive = true
+        }
     }
 
     // MARK: - Layout Margins Guide

@@ -40,6 +40,46 @@ extension UIView {
         } else if viewModel.corners.radius > 0 {
             clipsToBounds = true
         }
+
+        // Size
+        applySize(viewModel.size)
+    }
+
+    // MARK: - Size Helpers
+
+    private func applySize(_ size: SizeViewModel) {
+        applySizeDimension(size.width, for: .horizontal)
+        applySizeDimension(size.height, for: .vertical)
+    }
+
+    private func applySizeDimension(_ dimension: SizeDimension, for axis: NSLayoutConstraint.Axis) {
+        // Remove previous fixed constraint if any
+        if let existing = constraints.first(where: {
+            ($0.firstAttribute == (axis == .horizontal ? .width : .height))
+                && $0.secondItem == nil
+                && $0.identifier == "EDS.fixed.\(axis.rawValue)"
+        }) {
+            existing.isActive = false
+            removeConstraint(existing)
+        }
+
+        switch dimension {
+        case .hug:
+            setContentHuggingPriority(UILayoutPriority(751), for: axis)
+            setContentCompressionResistancePriority(UILayoutPriority(752), for: axis)
+        case .fill:
+            setContentHuggingPriority(UILayoutPriority(1), for: axis)
+            setContentCompressionResistancePriority(UILayoutPriority(752), for: axis)
+        case .fixed(let value):
+            setContentHuggingPriority(UILayoutPriority(751), for: axis)
+            setContentCompressionResistancePriority(UILayoutPriority(752), for: axis)
+            let constraint = axis == .horizontal
+                ? widthAnchor.constraint(equalToConstant: value)
+                : heightAnchor.constraint(equalToConstant: value)
+            constraint.priority = .required
+            constraint.identifier = "EDS.fixed.\(axis.rawValue)"
+            constraint.isActive = true
+        }
     }
 
     // MARK: - Dashed Border Helpers

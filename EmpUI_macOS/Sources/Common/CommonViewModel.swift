@@ -8,6 +8,7 @@ public struct CommonViewModel: Equatable {
     public let corners: Corners
     public let backgroundColor: NSColor
     public let layoutMargins: NSEdgeInsets
+    public let size: SizeViewModel
 
     // MARK: - Init
 
@@ -16,12 +17,14 @@ public struct CommonViewModel: Equatable {
         shadow: Shadow = Shadow(),
         corners: Corners = Corners(),
         backgroundColor: NSColor = .clear,
-        layoutMargins: NSEdgeInsets = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        layoutMargins: NSEdgeInsets = NSEdgeInsets(top: 0, left: 0, bottom: 0, right: 0),
+        size: SizeViewModel = SizeViewModel()
     ) {
         self.border = border
         self.shadow = shadow
         self.corners = corners
         self.backgroundColor = backgroundColor
         self.layoutMargins = layoutMargins
+        self.size = size
     }
 }

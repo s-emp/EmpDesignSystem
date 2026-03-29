@@ -14,7 +14,8 @@ struct CommonViewModelTests {
                 .layerMinXMaxYCorner, .layerMaxXMaxYCorner,
             ]),
             backgroundColor: .clear,
-            layoutMargins: .zero
+            layoutMargins: .zero,
+            size: SizeViewModel()
         )
         let sut = CommonViewModel()
         #expect(sut == expected)
