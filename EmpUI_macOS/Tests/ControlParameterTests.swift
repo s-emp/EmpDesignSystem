@@ -1,4 +1,5 @@
 import Testing
+import AppKit
 @testable import EmpUI_macOS
 
 @Suite("ControlParameter")
@@ -57,5 +58,23 @@ struct ControlParameterTests {
         let b = ControlParameter(normal: 10, hover: 20)
 
         #expect(a != b)
+    }
+
+    @Test("isStructurallyConsistent — true когда все состояния одной структуры")
+    func structurallyConsistentSameStructure() {
+        let content = ControlParameter<ComponentDescriptor>(
+            normal: .text(.init(content: .plain(.init(text: "Normal")))),
+            highlighted: .text(.init(content: .plain(.init(text: "Highlighted"))))
+        )
+        #expect(content.isStructurallyConsistent)
+    }
+
+    @Test("isStructurallyConsistent — false когда структура различается между состояниями")
+    func structurallyInconsistentDifferentStructure() {
+        let content = ControlParameter<ComponentDescriptor>(
+            normal: .text(.init(content: .plain(.init(text: "Normal")))),
+            highlighted: .stack(.init(), [.text(.init(content: .plain(.init(text: "Wrapped"))))])
+        )
+        #expect(!content.isStructurallyConsistent)
     }
 }

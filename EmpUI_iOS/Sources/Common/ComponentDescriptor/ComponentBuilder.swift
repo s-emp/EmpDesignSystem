@@ -50,15 +50,16 @@ public enum ComponentBuilder {
         case let .overlay(vm, children):
             let container = EOverlay()
             container.configure(with: vm)
+            let guide = container.layoutMarginsGuide
             for child in children {
                 let childView = build(from: child)
                 container.addSubview(childView)
                 childView.translatesAutoresizingMaskIntoConstraints = false
                 NSLayoutConstraint.activate([
-                    childView.topAnchor.constraint(equalTo: container.topAnchor),
-                    childView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-                    childView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-                    childView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+                    childView.topAnchor.constraint(equalTo: guide.topAnchor),
+                    childView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
+                    childView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+                    childView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
                 ])
             }
             return container
@@ -80,6 +81,7 @@ public enum ComponentBuilder {
             ])
             return scrollView
         case let .tap(vm, content):
+            assert(content.isStructurallyConsistent, "tap content must have the same structure across all states")
             let tap = ETapContainer()
             tap.configure(with: vm)
             let childView = build(from: content.normal)
@@ -128,6 +130,12 @@ public enum ComponentBuilder {
                 of: stack,
                 newChildren: newChildren,
                 getChildren: { $0.arrangedSubviews },
+                addChild: { stack, newView in
+                    stack.addArrangedSubview(newView)
+                },
+                removeChild: { _, oldView in
+                    oldView.removeFromSuperview()
+                },
                 replace: { stack, index, oldView, newView in
                     stack.removeArrangedSubview(oldView)
                     oldView.removeFromSuperview()
@@ -142,14 +150,27 @@ public enum ComponentBuilder {
                 of: container,
                 newChildren: newChildren,
                 getChildren: { $0.subviews },
+                addChild: { parent, newView in
+                    newView.translatesAutoresizingMaskIntoConstraints = false
+                    parent.addSubview(newView)
+                    NSLayoutConstraint.activate([
+                        newView.topAnchor.constraint(equalTo: parent.layoutMarginsGuide.topAnchor),
+                        newView.leadingAnchor.constraint(equalTo: parent.layoutMarginsGuide.leadingAnchor),
+                        newView.trailingAnchor.constraint(equalTo: parent.layoutMarginsGuide.trailingAnchor),
+                        newView.bottomAnchor.constraint(equalTo: parent.layoutMarginsGuide.bottomAnchor),
+                    ])
+                },
+                removeChild: { _, oldView in
+                    oldView.removeFromSuperview()
+                },
                 replace: { parent, _, oldView, newView in
                     newView.translatesAutoresizingMaskIntoConstraints = false
                     parent.insertSubview(newView, aboveSubview: oldView)
                     NSLayoutConstraint.activate([
-                        newView.topAnchor.constraint(equalTo: parent.topAnchor),
-                        newView.leadingAnchor.constraint(equalTo: parent.leadingAnchor),
-                        newView.trailingAnchor.constraint(equalTo: parent.trailingAnchor),
-                        newView.bottomAnchor.constraint(equalTo: parent.bottomAnchor),
+                        newView.topAnchor.constraint(equalTo: parent.layoutMarginsGuide.topAnchor),
+                        newView.leadingAnchor.constraint(equalTo: parent.layoutMarginsGuide.leadingAnchor),
+                        newView.trailingAnchor.constraint(equalTo: parent.layoutMarginsGuide.trailingAnchor),
+                        newView.bottomAnchor.constraint(equalTo: parent.layoutMarginsGuide.bottomAnchor),
                     ])
                     oldView.removeFromSuperview()
                 }
@@ -197,44 +218,73 @@ public enum ComponentBuilder {
         of parent: Parent,
         newChildren: [ComponentDescriptor],
         getChildren: (Parent) -> [UIView],
+        addChild: (Parent, UIView) -> Void,
+        removeChild: (Parent, UIView) -> Void,
         replace: (Parent, Int, UIView, UIView) -> Void
     ) {
         let childViews = getChildren(parent)
-        for (index, (childView, newChild)) in zip(childViews, newChildren).enumerated() {
-            if let newView = update(view: childView, with: newChild) {
-                replace(parent, index, childView, newView)
+        let commonCount = min(childViews.count, newChildren.count)
+
+        for index in 0..<commonCount {
+            if let newView = update(view: childViews[index], with: newChildren[index]) {
+                replace(parent, index, childViews[index], newView)
+            }
+        }
+
+        if newChildren.count > childViews.count {
+            for index in childViews.count..<newChildren.count {
+                addChild(parent, build(from: newChildren[index]))
+            }
+        } else if childViews.count > newChildren.count {
+            for index in stride(from: childViews.count - 1, through: newChildren.count, by: -1) {
+                removeChild(parent, childViews[index])
             }
         }
     }
 
     public static func reconfigure(view: UIView, with descriptor: ComponentDescriptor) {
         switch descriptor {
-        case let .text(vm):           (view as! EText).configure(with: vm)
-        case let .image(vm):          (view as! EImage).configure(with: vm)
-        case let .progressBar(vm):    (view as! EProgressBar).configure(with: vm)
-        case let .infoCard(vm):       (view as! EInfoCard).configure(with: vm)
-        case let .segmentControl(vm): (view as! ESegmentControl).configure(with: vm)
+        case let .text(vm):
+            assert(view is EText, "reconfigure type mismatch: expected EText, got \(type(of: view))")
+            (view as! EText).configure(with: vm)
+        case let .image(vm):
+            assert(view is EImage, "reconfigure type mismatch: expected EImage, got \(type(of: view))")
+            (view as! EImage).configure(with: vm)
+        case let .progressBar(vm):
+            assert(view is EProgressBar, "reconfigure type mismatch: expected EProgressBar, got \(type(of: view))")
+            (view as! EProgressBar).configure(with: vm)
+        case let .infoCard(vm):
+            assert(view is EInfoCard, "reconfigure type mismatch: expected EInfoCard, got \(type(of: view))")
+            (view as! EInfoCard).configure(with: vm)
+        case let .segmentControl(vm):
+            assert(view is ESegmentControl, "reconfigure type mismatch: expected ESegmentControl, got \(type(of: view))")
+            (view as! ESegmentControl).configure(with: vm)
         case let .stack(vm, children):
+            assert(view is EStack, "reconfigure type mismatch: expected EStack, got \(type(of: view))")
             let stack = view as! EStack
             stack.configure(with: vm)
             for (childView, childDescriptor) in zip(stack.arrangedSubviews, children) {
                 reconfigure(view: childView, with: childDescriptor)
             }
         case let .overlay(vm, children):
+            assert(view is EOverlay, "reconfigure type mismatch: expected EOverlay, got \(type(of: view))")
             let container = view as! EOverlay
             container.configure(with: vm)
             for (childView, childDescriptor) in zip(container.subviews, children) {
                 reconfigure(view: childView, with: childDescriptor)
             }
         case let .spacer(vm):
+            assert(view is ESpacer, "reconfigure type mismatch: expected ESpacer, got \(type(of: view))")
             (view as! ESpacer).configure(with: vm)
         case let .scroll(vm, child):
+            assert(view is EScroll, "reconfigure type mismatch: expected EScroll, got \(type(of: view))")
             let scrollView = view as! EScroll
             scrollView.configure(with: vm)
             if let contentView = scrollView.subviews.first {
                 reconfigure(view: contentView, with: child)
             }
         case let .tap(vm, content):
+            assert(view is ETapContainer, "reconfigure type mismatch: expected ETapContainer, got \(type(of: view))")
             let tap = view as! ETapContainer
             tap.configure(with: vm)
             tap.onStateChange = { [weak tap] state in

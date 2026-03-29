@@ -5,36 +5,6 @@ public final class EImage: UIView, EComponent {
 
     public private(set) var viewModel: ViewModel = ViewModel(image: UIImage(), size: .zero)
 
-    // MARK: - ViewModel
-
-    public struct ViewModel: ComponentViewModel {
-        public let common: CommonViewModel
-        public let image: UIImage
-        public let tintColor: UIColor?
-        public let size: CGSize
-        public let contentMode: ContentMode
-
-        public enum ContentMode {
-            case aspectFit
-            case aspectFill
-            case center
-        }
-
-        public init(
-            common: CommonViewModel = CommonViewModel(),
-            image: UIImage,
-            tintColor: UIColor? = nil,
-            size: CGSize,
-            contentMode: ContentMode = .aspectFit
-        ) {
-            self.common = common
-            self.image = image
-            self.tintColor = tintColor
-            self.size = size
-            self.contentMode = contentMode
-        }
-    }
-
     // MARK: - UI Elements
 
     private let imageView: UIImageView = {

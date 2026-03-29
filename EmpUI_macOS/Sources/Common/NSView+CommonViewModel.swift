@@ -50,7 +50,7 @@ extension NSView {
 
     private func applySizeDimension(_ dimension: SizeDimension, for orientation: NSLayoutConstraint.Orientation) {
         let attribute: NSLayoutConstraint.Attribute = orientation == .horizontal ? .width : .height
-        let identifierSuffix = orientation == .horizontal ? "0" : "1"
+        let identifierSuffix = orientation == .horizontal ? "width" : "height"
 
         if let existing = constraints.first(where: {
             $0.firstAttribute == attribute

@@ -95,6 +95,103 @@ struct ComponentBuilderContainerTests {
         #expect(tap.contentView is EText)
     }
 
+    @Test("update stack — новые children добавляются в конец")
+    func updateStackAddsNewChildren() throws {
+        let d1 = ComponentDescriptor.stack(.init(), [
+            .text(.init(content: .plain(.init(text: "A")))),
+        ])
+        let view = ComponentBuilder.build(from: d1)
+        let stack = try #require(view as? EStack)
+        #expect(stack.arrangedSubviews.count == 1)
+
+        let d2 = ComponentDescriptor.stack(.init(), [
+            .text(.init(content: .plain(.init(text: "A")))),
+            .text(.init(content: .plain(.init(text: "B")))),
+            .text(.init(content: .plain(.init(text: "C")))),
+        ])
+        ComponentBuilder.update(view: view, with: d2)
+
+        #expect(stack.arrangedSubviews.count == 3)
+        let textB = try #require(stack.arrangedSubviews[1] as? EText)
+        #expect(textB.viewModel.content == .plain(.init(text: "B")))
+        let textC = try #require(stack.arrangedSubviews[2] as? EText)
+        #expect(textC.viewModel.content == .plain(.init(text: "C")))
+    }
+
+    @Test("update stack — лишние children удаляются")
+    func updateStackRemovesExtraChildren() throws {
+        let d1 = ComponentDescriptor.stack(.init(), [
+            .text(.init(content: .plain(.init(text: "A")))),
+            .text(.init(content: .plain(.init(text: "B")))),
+            .text(.init(content: .plain(.init(text: "C")))),
+        ])
+        let view = ComponentBuilder.build(from: d1)
+        let stack = try #require(view as? EStack)
+        #expect(stack.arrangedSubviews.count == 3)
+
+        let d2 = ComponentDescriptor.stack(.init(), [
+            .text(.init(content: .plain(.init(text: "A")))),
+        ])
+        ComponentBuilder.update(view: view, with: d2)
+
+        #expect(stack.arrangedSubviews.count == 1)
+    }
+
+    @Test("update overlay — новые children добавляются")
+    func updateOverlayAddsNewChildren() throws {
+        let d1 = ComponentDescriptor.overlay(.init(), [
+            .text(.init(content: .plain(.init(text: "Base")))),
+        ])
+        let view = ComponentBuilder.build(from: d1)
+        let overlay = try #require(view as? EOverlay)
+        #expect(overlay.subviews.count == 1)
+
+        let d2 = ComponentDescriptor.overlay(.init(), [
+            .text(.init(content: .plain(.init(text: "Base")))),
+            .text(.init(content: .plain(.init(text: "Top")))),
+        ])
+        ComponentBuilder.update(view: view, with: d2)
+
+        #expect(overlay.subviews.count == 2)
+    }
+
+    @Test("update overlay — лишние children удаляются")
+    func updateOverlayRemovesExtraChildren() throws {
+        let d1 = ComponentDescriptor.overlay(.init(), [
+            .text(.init(content: .plain(.init(text: "Base")))),
+            .text(.init(content: .plain(.init(text: "Top")))),
+        ])
+        let view = ComponentBuilder.build(from: d1)
+        let overlay = try #require(view as? EOverlay)
+        #expect(overlay.subviews.count == 2)
+
+        let d2 = ComponentDescriptor.overlay(.init(), [
+            .text(.init(content: .plain(.init(text: "Base")))),
+        ])
+        ComponentBuilder.update(view: view, with: d2)
+
+        #expect(overlay.subviews.count == 1)
+    }
+
+    @Test("build overlay — children привязаны к layoutMarginsGuide")
+    func buildOverlayChildrenConstrainedToMarginsGuide() throws {
+        let margins = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
+        let descriptor = ComponentDescriptor.overlay(
+            .init(common: CommonViewModel(layoutMargins: margins)),
+            [.text(.init(content: .plain(.init(text: "Child"))))]
+        )
+        let view = ComponentBuilder.build(from: descriptor)
+        let overlay = try #require(view as? EOverlay)
+        let child = try #require(overlay.subviews.first)
+        let guide = overlay.layoutMarginsGuide
+
+        let hasTopToGuide = overlay.constraints.contains(where: { c in
+            (c.firstAnchor == child.topAnchor && c.secondAnchor == guide.topAnchor)
+                || (c.firstAnchor == guide.topAnchor && c.secondAnchor == child.topAnchor)
+        })
+        #expect(hasTopToGuide, "Child top должен быть привязан к layoutMarginsGuide.top, а не к overlay.top")
+    }
+
     @Test("update stack — skip неизменённые children")
     func updateStackSkipChildren() throws {
         let unchanged = ComponentDescriptor.text(.init(content: .plain(.init(text: "Static"))))

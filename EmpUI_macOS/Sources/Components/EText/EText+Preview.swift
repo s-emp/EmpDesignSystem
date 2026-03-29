@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 @available(macOS 14.0, *)
-#Preview("EmpText — Plain") {
+#Preview("EText — Plain") {
     let view = EText()
     let _ = view.configure(with: .init(
         content: .plain(.init(text: "Hello, World!"))
@@ -11,7 +11,7 @@ import SwiftUI
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpText — Bold Title") {
+#Preview("EText — Bold Title") {
     let view = EText()
     let _ = view.configure(with: .init(
         content: .plain(.init(
@@ -24,7 +24,7 @@ import SwiftUI
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpText — Multiline") {
+#Preview("EText — Multiline") {
     let view = EText()
     let _ = view.configure(with: .init(
         content: .plain(.init(
@@ -38,7 +38,7 @@ import SwiftUI
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpText — Single Line") {
+#Preview("EText — Single Line") {
     let view = EText()
     let _ = view.configure(with: .init(
         content: .plain(.init(text: "This is a long text that should be truncated on a single line.")),
@@ -48,7 +48,7 @@ import SwiftUI
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpText — Center Aligned") {
+#Preview("EText — Center Aligned") {
     let view = EText()
     let _ = view.configure(with: .init(
         content: .plain(.init(text: "Centered Text")),
@@ -58,7 +58,7 @@ import SwiftUI
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpText — Attributed") {
+#Preview("EText — Attributed") {
     let view = EText()
     let attributed = NSAttributedString(
         string: "Attributed Text",

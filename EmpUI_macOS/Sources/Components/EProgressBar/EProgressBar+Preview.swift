@@ -2,42 +2,42 @@ import AppKit
 import SwiftUI
 
 @available(macOS 14.0, *)
-#Preview("EmpProgressBar — 0%") {
+#Preview("EProgressBar — 0%") {
     let view = EProgressBar()
     let _ = view.configure(with: .init(progress: 0))
     view
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpProgressBar — 25%") {
+#Preview("EProgressBar — 25%") {
     let view = EProgressBar()
     let _ = view.configure(with: .init(progress: 0.25))
     view
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpProgressBar — 50%") {
+#Preview("EProgressBar — 50%") {
     let view = EProgressBar()
     let _ = view.configure(with: .init(progress: 0.5))
     view
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpProgressBar — 75%") {
+#Preview("EProgressBar — 75%") {
     let view = EProgressBar()
     let _ = view.configure(with: .init(progress: 0.75))
     view
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpProgressBar — 100%") {
+#Preview("EProgressBar — 100%") {
     let view = EProgressBar()
     let _ = view.configure(with: .init(progress: 1.0))
     view
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpProgressBar — Толстая полоса") {
+#Preview("EProgressBar — Толстая полоса") {
     let view = EProgressBar()
     let _ = view.configure(with: .init(
         progress: 0.6,
@@ -47,7 +47,7 @@ import SwiftUI
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpProgressBar — Кастомные цвета") {
+#Preview("EProgressBar — Кастомные цвета") {
     let view = EProgressBar()
     let _ = view.configure(with: .init(
         progress: 0.4,
@@ -58,7 +58,7 @@ import SwiftUI
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpProgressBar — Danger") {
+#Preview("EProgressBar — Danger") {
     let view = EProgressBar()
     let _ = view.configure(with: .init(
         progress: 0.9,

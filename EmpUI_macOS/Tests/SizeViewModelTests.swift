@@ -1,4 +1,5 @@
 @testable import EmpUI_macOS
+import AppKit
 import Testing
 
 @Suite("SizeViewModel")
@@ -35,5 +36,29 @@ struct SizeViewModelTests {
     @Test("SizeDimension.fixed с разными значениями не равны")
     func fixedNotEqual() {
         #expect(SizeDimension.fixed(10) != SizeDimension.fixed(20))
+    }
+
+    @Test("fixed width constraint имеет идентификатор 'EDS.fixed.width'")
+    @MainActor
+    func fixedWidthConstraintIdentifier() {
+        let view = NSView()
+        view.apply(common: CommonViewModel(size: .init(width: .fixed(100))))
+
+        let constraint = view.constraints.first(where: {
+            $0.firstAttribute == .width && $0.secondItem == nil
+        })
+        #expect(constraint?.identifier == "EDS.fixed.width")
+    }
+
+    @Test("fixed height constraint имеет идентификатор 'EDS.fixed.height'")
+    @MainActor
+    func fixedHeightConstraintIdentifier() {
+        let view = NSView()
+        view.apply(common: CommonViewModel(size: .init(height: .fixed(50))))
+
+        let constraint = view.constraints.first(where: {
+            $0.firstAttribute == .height && $0.secondItem == nil
+        })
+        #expect(constraint?.identifier == "EDS.fixed.height")
     }
 }

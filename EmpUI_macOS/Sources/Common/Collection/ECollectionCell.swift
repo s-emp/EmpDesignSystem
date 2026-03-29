@@ -28,10 +28,6 @@ public final class ECollectionCell: NSCollectionViewItem {
         }
     }
 
-    override public func prepareForReuse() {
-        super.prepareForReuse()
-    }
-
     override public func loadView() {
         view = NSView()
     }

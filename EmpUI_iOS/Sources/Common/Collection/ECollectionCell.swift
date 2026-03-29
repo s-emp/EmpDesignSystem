@@ -27,7 +27,4 @@ public final class ECollectionCell: UICollectionViewCell {
         }
     }
 
-    public override func prepareForReuse() {
-        super.prepareForReuse()
-    }
 }

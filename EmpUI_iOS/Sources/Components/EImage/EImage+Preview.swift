@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 @available(iOS 17.0, *)
-#Preview("EmpImage — SF Symbol") {
+#Preview("EImage — SF Symbol") {
     let view = EImage()
     // swiftlint:disable:next force_unwrapping
     let icon = UIImage(systemName: "star.fill")!
@@ -15,7 +15,7 @@ import UIKit
 }
 
 @available(iOS 17.0, *)
-#Preview("EmpImage — SF Symbol Large") {
+#Preview("EImage — SF Symbol Large") {
     let view = EImage()
     // swiftlint:disable:next force_unwrapping
     let icon = UIImage(systemName: "heart.fill")!
@@ -28,7 +28,7 @@ import UIKit
 }
 
 @available(iOS 17.0, *)
-#Preview("EmpImage — SF Symbol No Tint") {
+#Preview("EImage — SF Symbol No Tint") {
     let view = EImage()
     // swiftlint:disable:next force_unwrapping
     let icon = UIImage(systemName: "globe")!
@@ -40,7 +40,7 @@ import UIKit
 }
 
 @available(iOS 17.0, *)
-#Preview("EmpImage — With Common Styling") {
+#Preview("EImage — With Common Styling") {
     let view = EImage()
     // swiftlint:disable:next force_unwrapping
     let icon = UIImage(systemName: "person.fill")!
@@ -59,7 +59,7 @@ import UIKit
 }
 
 @available(iOS 17.0, *)
-#Preview("EmpImage — Center Mode") {
+#Preview("EImage — Center Mode") {
     let view = EImage()
     // swiftlint:disable:next force_unwrapping
     let icon = UIImage(systemName: "checkmark.circle.fill")!

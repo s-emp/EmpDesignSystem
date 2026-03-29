@@ -53,11 +53,12 @@ extension UIView {
     }
 
     private func applySizeDimension(_ dimension: SizeDimension, for axis: NSLayoutConstraint.Axis) {
-        // Remove previous fixed constraint if any
+        let identifierSuffix = axis == .horizontal ? "width" : "height"
+
         if let existing = constraints.first(where: {
             ($0.firstAttribute == (axis == .horizontal ? .width : .height))
                 && $0.secondItem == nil
-                && $0.identifier == "EDS.fixed.\(axis.rawValue)"
+                && $0.identifier == "EDS.fixed.\(identifierSuffix)"
         }) {
             existing.isActive = false
             removeConstraint(existing)
@@ -77,7 +78,7 @@ extension UIView {
                 ? widthAnchor.constraint(equalToConstant: value)
                 : heightAnchor.constraint(equalToConstant: value)
             constraint.priority = .required
-            constraint.identifier = "EDS.fixed.\(axis.rawValue)"
+            constraint.identifier = "EDS.fixed.\(identifierSuffix)"
             constraint.isActive = true
         }
     }

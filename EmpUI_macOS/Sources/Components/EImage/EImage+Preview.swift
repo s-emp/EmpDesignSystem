@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 @available(macOS 14.0, *)
-#Preview("EmpImage — SF Symbol") {
+#Preview("EImage — SF Symbol") {
     let view = EImage()
     // swiftlint:disable:next force_unwrapping
     let icon = NSImage(systemSymbolName: "star.fill", accessibilityDescription: nil)!
@@ -15,7 +15,7 @@ import SwiftUI
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpImage — SF Symbol Large") {
+#Preview("EImage — SF Symbol Large") {
     let view = EImage()
     // swiftlint:disable:next force_unwrapping
     let icon = NSImage(systemSymbolName: "heart.fill", accessibilityDescription: nil)!
@@ -28,7 +28,7 @@ import SwiftUI
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpImage — SF Symbol No Tint") {
+#Preview("EImage — SF Symbol No Tint") {
     let view = EImage()
     // swiftlint:disable:next force_unwrapping
     let icon = NSImage(systemSymbolName: "globe", accessibilityDescription: nil)!
@@ -40,7 +40,7 @@ import SwiftUI
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpImage — With Common Styling") {
+#Preview("EImage — With Common Styling") {
     let view = EImage()
     // swiftlint:disable:next force_unwrapping
     let icon = NSImage(systemSymbolName: "person.fill", accessibilityDescription: nil)!
@@ -59,7 +59,7 @@ import SwiftUI
 }
 
 @available(macOS 14.0, *)
-#Preview("EmpImage — Center Mode") {
+#Preview("EImage — Center Mode") {
     let view = EImage()
     // swiftlint:disable:next force_unwrapping
     let icon = NSImage(systemSymbolName: "checkmark.circle.fill", accessibilityDescription: nil)!

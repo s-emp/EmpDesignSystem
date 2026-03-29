@@ -7,8 +7,8 @@ public final class EScroll: UIScrollView, EComponent {
     public func configure(with viewModel: ViewModel) -> Self {
         self.viewModel = viewModel
         apply(common: viewModel.common)
-        showsVerticalScrollIndicator = viewModel.showsIndicators
-        showsHorizontalScrollIndicator = viewModel.showsIndicators
+        showsVerticalScrollIndicator = viewModel.showsIndicators && viewModel.axis == .vertical
+        showsHorizontalScrollIndicator = viewModel.showsIndicators && viewModel.axis == .horizontal
         return self
     }
 }
