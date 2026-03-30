@@ -17,12 +17,12 @@ struct ETextPlainTextTests {
         #expect(sut.color == color)
     }
 
-    @Test("Дефолтные значения — systemFont 14, textPrimary")
+    @Test("Дефолтные значения — preferredFont body, textPrimary")
     func defaultValues() {
         let sut = EText.Content.PlainText(text: "Test")
 
         #expect(sut.text == "Test")
-        #expect(sut.font == .systemFont(ofSize: 14))
+        #expect(sut.font == .preferredFont(forTextStyle: .body))
         #expect(sut.color == UIColor.Semantic.textPrimary)
     }
 }

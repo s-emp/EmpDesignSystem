@@ -16,7 +16,7 @@ public extension EText {
 
             public init(
                 text: String,
-                font: UIFont = .systemFont(ofSize: 14),
+                font: UIFont = .preferredFont(forTextStyle: .body),
                 color: UIColor = UIColor.Semantic.textPrimary
             ) {
                 self.text = text
