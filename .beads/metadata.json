@@ -1,7 +1,7 @@
 {
   "database": "dolt",
   "backend": "dolt",
-  "dolt_mode": "server",
+  "dolt_mode": "embedded",
   "dolt_database": "EmpDesignSystem",
   "project_id": "fd6a5cb0-2068-4b5b-9883-62c39217ab13"
 }
