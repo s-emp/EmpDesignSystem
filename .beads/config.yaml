@@ -1,0 +1,4 @@
+repos:
+  primary: "."
+  additional:
+    - "/Users/emp15/.beads-planning"
