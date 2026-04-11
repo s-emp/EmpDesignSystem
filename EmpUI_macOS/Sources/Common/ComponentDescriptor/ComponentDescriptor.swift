@@ -3,6 +3,7 @@ import AppKit
 public enum ComponentDescriptor: Equatable {
     // Листовые компоненты
     case text(EText.ViewModel)
+    case richLabel(ERichLabel.ViewModel)
     case image(EImage.ViewModel)
     case icon(EIcon.ViewModel)
     case progressBar(EProgressBar.ViewModel)

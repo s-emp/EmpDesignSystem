@@ -9,6 +9,7 @@ extension ComponentDescriptor {
     public var fingerprint: StructureFingerprint {
         switch self {
         case .text:           return .leaf("text")
+        case .richLabel:      return .leaf("richLabel")
         case .image:          return .leaf("image")
         case .icon:           return .leaf("icon")
         case .progressBar:    return .leaf("progressBar")

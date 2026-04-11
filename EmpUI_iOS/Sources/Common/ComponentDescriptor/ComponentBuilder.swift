@@ -24,6 +24,10 @@ public enum ComponentBuilder {
             let v = EText()
             v.configure(with: vm)
             return v
+        case let .richLabel(vm):
+            let v = ERichLabel()
+            v.configure(with: vm)
+            return v
         case let .image(vm):
             let v = EImage()
             v.configure(with: vm)
@@ -106,6 +110,11 @@ public enum ComponentBuilder {
             if text.viewModel == newVM { log("SKIP"); return nil }
             log("UPDATE: reconfigure")
             text.configure(with: newVM)
+        case let .richLabel(newVM):
+            guard let label = view as? ERichLabel else { log("REBUILD: type mismatch"); return build(from: new) }
+            if label.viewModel == newVM { log("SKIP"); return nil }
+            log("UPDATE: reconfigure")
+            label.configure(with: newVM)
         case let .image(newVM):
             guard let image = view as? EImage else { log("REBUILD: type mismatch"); return build(from: new) }
             if image.viewModel == newVM { log("SKIP"); return nil }
@@ -256,6 +265,9 @@ public enum ComponentBuilder {
         case let .text(vm):
             assert(view is EText, "reconfigure type mismatch: expected EText, got \(type(of: view))")
             (view as! EText).configure(with: vm)
+        case let .richLabel(vm):
+            assert(view is ERichLabel, "reconfigure type mismatch: expected ERichLabel, got \(type(of: view))")
+            (view as! ERichLabel).configure(with: vm)
         case let .image(vm):
             assert(view is EImage, "reconfigure type mismatch: expected EImage, got \(type(of: view))")
             (view as! EImage).configure(with: vm)
