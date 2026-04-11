@@ -85,6 +85,12 @@ public enum ComponentBuilder {
                 Self.reconfigure(view: contentView, with: content[state])
             }
             return tap
+        case let .animation(vm, child):
+            let container = EAnimationContainer()
+            container.configure(with: vm)
+            let childView = build(from: child)
+            container.setContent(childView)
+            return container
         }
     }
 
@@ -179,6 +185,15 @@ public enum ComponentBuilder {
             if let contentView = tap.contentView {
                 if let newContentView = update(view: contentView, with: content[tap.currentState]) {
                     tap.setContent(newContentView)
+                }
+            }
+        case let .animation(newVM, child):
+            guard let container = view as? EAnimationContainer else { log("REBUILD: type mismatch"); return build(from: new) }
+            log("UPDATE: reconfigure")
+            container.configure(with: newVM)
+            if let contentView = container.contentView {
+                if let newContentView = update(view: contentView, with: child) {
+                    container.setContent(newContentView)
                 }
             }
         }
@@ -286,6 +301,13 @@ public enum ComponentBuilder {
             }
             if let contentView = tap.contentView {
                 reconfigure(view: contentView, with: content[tap.currentState])
+            }
+        case let .animation(vm, child):
+            assert(view is EAnimationContainer, "reconfigure type mismatch: expected EAnimationContainer, got \(type(of: view))")
+            let container = view as! EAnimationContainer
+            container.configure(with: vm)
+            if let contentView = container.contentView {
+                reconfigure(view: contentView, with: child)
             }
         }
     }
