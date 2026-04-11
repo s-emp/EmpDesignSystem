@@ -64,12 +64,20 @@ public enum ComponentBuilder {
             let v = EToggle()
             v.configure(with: vm)
             return v
+        case let .slider(vm):
+            let v = ESlider()
+            v.configure(with: vm)
+            return v
         case let .infoCard(vm):
             let v = EInfoCard()
             v.configure(with: vm)
             return v
         case let .segmentControl(vm):
             let v = ESegmentControl()
+            v.configure(with: vm)
+            return v
+        case let .dropdown(vm):
+            let v = EDropdown()
             v.configure(with: vm)
             return v
         case let .stack(vm, children):
@@ -211,6 +219,11 @@ public enum ComponentBuilder {
             if toggle.viewModel == newVM { log("SKIP"); return nil }
             log("UPDATE: reconfigure")
             toggle.configure(with: newVM)
+        case let .slider(newVM):
+            guard let slider = view as? ESlider else { log("REBUILD: type mismatch"); return build(from: new) }
+            if slider.viewModel == newVM { log("SKIP"); return nil }
+            log("UPDATE: reconfigure")
+            slider.configure(with: newVM)
         case let .infoCard(newVM):
             guard let card = view as? EInfoCard else { log("REBUILD: type mismatch"); return build(from: new) }
             if card.viewModel == newVM { log("SKIP"); return nil }
@@ -221,6 +234,11 @@ public enum ComponentBuilder {
             if seg.viewModel == newVM { log("SKIP"); return nil }
             log("UPDATE: reconfigure")
             seg.configure(with: newVM)
+        case let .dropdown(newVM):
+            guard let dropdown = view as? EDropdown else { log("REBUILD: type mismatch"); return build(from: new) }
+            if dropdown.viewModel == newVM { log("SKIP"); return nil }
+            log("UPDATE: reconfigure")
+            dropdown.configure(with: newVM)
         case let .stack(newVM, newChildren):
             guard let stack = view as? EStack else { log("REBUILD: type mismatch"); return build(from: new) }
             log("UPDATE: reconfigure")
@@ -411,12 +429,18 @@ public enum ComponentBuilder {
         case let .toggle(vm):
             assert(view is EToggle, "reconfigure type mismatch: expected EToggle, got \(type(of: view))")
             (view as! EToggle).configure(with: vm)
+        case let .slider(vm):
+            assert(view is ESlider, "reconfigure type mismatch: expected ESlider, got \(type(of: view))")
+            (view as! ESlider).configure(with: vm)
         case let .infoCard(vm):
             assert(view is EInfoCard, "reconfigure type mismatch: expected EInfoCard, got \(type(of: view))")
             (view as! EInfoCard).configure(with: vm)
         case let .segmentControl(vm):
             assert(view is ESegmentControl, "reconfigure type mismatch: expected ESegmentControl, got \(type(of: view))")
             (view as! ESegmentControl).configure(with: vm)
+        case let .dropdown(vm):
+            assert(view is EDropdown, "reconfigure type mismatch: expected EDropdown, got \(type(of: view))")
+            (view as! EDropdown).configure(with: vm)
         case let .stack(vm, children):
             assert(view is EStack, "reconfigure type mismatch: expected EStack, got \(type(of: view))")
             let stack = view as! EStack
