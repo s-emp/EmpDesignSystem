@@ -13,6 +13,7 @@ extension ComponentDescriptor {
         case .progressBar:    return .leaf("progressBar")
         case .infoCard:       return .leaf("infoCard")
         case .segmentControl: return .leaf("segmentControl")
+        case .dropdown:       return .leaf("dropdown")
         case let .stack(_, children):
             return .container("stack", children.map(\.fingerprint))
         case let .overlay(_, children):
