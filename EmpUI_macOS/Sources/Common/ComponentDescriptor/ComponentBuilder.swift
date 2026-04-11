@@ -60,6 +60,10 @@ public enum ComponentBuilder {
             let v = ETextView()
             v.configure(with: vm)
             return v
+        case let .toggle(vm):
+            let v = EToggle()
+            v.configure(with: vm)
+            return v
         case let .infoCard(vm):
             let v = EInfoCard()
             v.configure(with: vm)
@@ -169,6 +173,11 @@ public enum ComponentBuilder {
             if tv.viewModel == newVM { log("SKIP"); return nil }
             log("UPDATE: reconfigure")
             tv.configure(with: newVM)
+        case let .toggle(newVM):
+            guard let toggle = view as? EToggle else { log("REBUILD: type mismatch"); return build(from: new) }
+            if toggle.viewModel == newVM { log("SKIP"); return nil }
+            log("UPDATE: reconfigure")
+            toggle.configure(with: newVM)
         case let .infoCard(newVM):
             guard let card = view as? EInfoCard else { log("REBUILD: type mismatch"); return build(from: new) }
             if card.viewModel == newVM { log("SKIP"); return nil }
@@ -330,6 +339,9 @@ public enum ComponentBuilder {
         case let .textView(vm):
             assert(view is ETextView, "reconfigure type mismatch: expected ETextView, got \(type(of: view))")
             (view as! ETextView).configure(with: vm)
+        case let .toggle(vm):
+            assert(view is EToggle, "reconfigure type mismatch: expected EToggle, got \(type(of: view))")
+            (view as! EToggle).configure(with: vm)
         case let .infoCard(vm):
             assert(view is EInfoCard, "reconfigure type mismatch: expected EInfoCard, got \(type(of: view))")
             (view as! EInfoCard).configure(with: vm)

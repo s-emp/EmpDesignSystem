@@ -12,6 +12,7 @@ public enum ComponentDescriptor: Equatable {
     case animationView(EAnimationView.ViewModel)
     case textField(ETextField.ViewModel)
     case textView(ETextView.ViewModel)
+    case toggle(EToggle.ViewModel)
 
     // Составные компоненты
     case infoCard(EInfoCard.ViewModel)
