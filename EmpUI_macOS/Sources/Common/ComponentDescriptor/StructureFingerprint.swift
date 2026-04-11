@@ -10,7 +10,8 @@ extension ComponentDescriptor {
         switch self {
         case .text:           return .leaf("text")
         case .image:          return .leaf("image")
-        case .progressBar:    return .leaf("progressBar")
+        case .progressBar:        return .leaf("progressBar")
+        case .activityIndicator:  return .leaf("activityIndicator")
         case .infoCard:       return .leaf("infoCard")
         case .segmentControl: return .leaf("segmentControl")
         case let .stack(_, children):
