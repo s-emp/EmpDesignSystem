@@ -33,4 +33,5 @@ public enum ComponentDescriptor: Equatable {
     indirect case list(EListContainer.ViewModel, [ComponentDescriptor])
     case native(ENativeContainer.ViewModel)
     indirect case splitView(ESplitView.ViewModel, [ComponentDescriptor])
+    indirect case disclosure(EDisclosure.ViewModel, ComponentDescriptor)
 }

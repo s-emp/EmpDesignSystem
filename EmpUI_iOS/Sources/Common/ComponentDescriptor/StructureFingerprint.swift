@@ -41,6 +41,8 @@ extension ComponentDescriptor {
             return .container("list", children.map(\.fingerprint))
         case .native:
             return .leaf("native")
+        case let .disclosure(_, child):
+            return .container("disclosure", [child.fingerprint])
         }
     }
 }

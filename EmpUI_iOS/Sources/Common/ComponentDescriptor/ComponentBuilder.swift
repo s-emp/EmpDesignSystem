@@ -157,6 +157,12 @@ public enum ComponentBuilder {
             let v = ENativeContainer()
             v.configure(with: vm)
             return v
+        case let .disclosure(vm, child):
+            let disclosure = EDisclosure()
+            disclosure.configure(with: vm)
+            let childView = build(from: child)
+            disclosure.setContent(childView)
+            return disclosure
         }
     }
 
@@ -358,6 +364,15 @@ public enum ComponentBuilder {
             if container.viewModel == newVM { log("SKIP"); return nil }
             log("UPDATE: reconfigure")
             container.configure(with: newVM)
+        case let .disclosure(newVM, child):
+            guard let disclosure = view as? EDisclosure else { log("REBUILD: type mismatch"); return build(from: new) }
+            log("UPDATE: reconfigure")
+            disclosure.configure(with: newVM)
+            if let contentView = disclosure.contentView {
+                if let newContentView = update(view: contentView, with: child) {
+                    disclosure.setContent(newContentView)
+                }
+            }
         }
         return nil
     }
@@ -498,6 +513,13 @@ public enum ComponentBuilder {
         case let .native(vm):
             assert(view is ENativeContainer, "reconfigure type mismatch: expected ENativeContainer, got \(type(of: view))")
             (view as! ENativeContainer).configure(with: vm)
+        case let .disclosure(vm, child):
+            assert(view is EDisclosure, "reconfigure type mismatch: expected EDisclosure, got \(type(of: view))")
+            let disclosure = view as! EDisclosure
+            disclosure.configure(with: vm)
+            if let contentView = disclosure.contentView {
+                reconfigure(view: contentView, with: child)
+            }
         }
     }
 }

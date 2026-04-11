@@ -158,6 +158,12 @@ public enum ComponentBuilder {
                 split.addPanel(build(from: child))
             }
             return split
+        case let .disclosure(vm, child):
+            let disclosure = EDisclosure()
+            disclosure.configure(with: vm)
+            let childView = build(from: child)
+            disclosure.setContent(childView)
+            return disclosure
         }
     }
 
@@ -340,6 +346,15 @@ public enum ComponentBuilder {
             guard let split = view as? ESplitView else { log("REBUILD: type mismatch"); return build(from: new) }
             log("UPDATE: reconfigure")
             split.configure(with: newVM)
+        case let .disclosure(newVM, child):
+            guard let disclosure = view as? EDisclosure else { log("REBUILD: type mismatch"); return build(from: new) }
+            log("UPDATE: reconfigure")
+            disclosure.configure(with: newVM)
+            if let contentView = disclosure.contentView {
+                if let newContentView = update(view: contentView, with: child) {
+                    disclosure.setContent(newContentView)
+                }
+            }
         }
         return nil
     }
@@ -506,6 +521,13 @@ public enum ComponentBuilder {
             assert(view is ESplitView, "reconfigure type mismatch: expected ESplitView, got \(type(of: view))")
             let split = view as! ESplitView
             split.configure(with: vm)
+        case let .disclosure(vm, child):
+            assert(view is EDisclosure, "reconfigure type mismatch: expected EDisclosure, got \(type(of: view))")
+            let disclosure = view as! EDisclosure
+            disclosure.configure(with: vm)
+            if let contentView = disclosure.contentView {
+                reconfigure(view: contentView, with: child)
+            }
         }
     }
 }
