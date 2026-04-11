@@ -17,6 +17,7 @@ extension ComponentDescriptor {
         case .divider:           return .leaf("divider")
         case .animationView:     return .leaf("animationView")
         case .textField:         return .leaf("textField")
+        case .textView:          return .leaf("textView")
         case .infoCard:       return .leaf("infoCard")
         case .segmentControl: return .leaf("segmentControl")
         case let .stack(_, children):

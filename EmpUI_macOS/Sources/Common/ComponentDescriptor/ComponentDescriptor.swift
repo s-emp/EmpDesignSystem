@@ -11,6 +11,7 @@ public enum ComponentDescriptor: Equatable {
     case divider(EDivider.ViewModel)
     case animationView(EAnimationView.ViewModel)
     case textField(ETextField.ViewModel)
+    case textView(ETextView.ViewModel)
 
     // Составные компоненты
     case infoCard(EInfoCard.ViewModel)
