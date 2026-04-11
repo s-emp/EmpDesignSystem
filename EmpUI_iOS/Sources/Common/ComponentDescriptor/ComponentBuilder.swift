@@ -44,6 +44,10 @@ public enum ComponentBuilder {
             let v = EActivityIndicator()
             v.configure(with: vm)
             return v
+        case let .divider(vm):
+            let v = EDivider()
+            v.configure(with: vm)
+            return v
         case let .infoCard(vm):
             let v = EInfoCard()
             v.configure(with: vm)
@@ -139,6 +143,11 @@ public enum ComponentBuilder {
             if indicator.viewModel == newVM { log("SKIP"); return nil }
             log("UPDATE: reconfigure")
             indicator.configure(with: newVM)
+        case let .divider(newVM):
+            guard let divider = view as? EDivider else { log("REBUILD: type mismatch"); return build(from: new) }
+            if divider.viewModel == newVM { log("SKIP"); return nil }
+            log("UPDATE: reconfigure")
+            divider.configure(with: newVM)
         case let .infoCard(newVM):
             guard let card = view as? EInfoCard else { log("REBUILD: type mismatch"); return build(from: new) }
             if card.viewModel == newVM { log("SKIP"); return nil }
@@ -289,6 +298,9 @@ public enum ComponentBuilder {
         case let .activityIndicator(vm):
             assert(view is EActivityIndicator, "reconfigure type mismatch: expected EActivityIndicator, got \(type(of: view))")
             (view as! EActivityIndicator).configure(with: vm)
+        case let .divider(vm):
+            assert(view is EDivider, "reconfigure type mismatch: expected EDivider, got \(type(of: view))")
+            (view as! EDivider).configure(with: vm)
         case let .infoCard(vm):
             assert(view is EInfoCard, "reconfigure type mismatch: expected EInfoCard, got \(type(of: view))")
             (view as! EInfoCard).configure(with: vm)
