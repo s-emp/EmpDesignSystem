@@ -91,6 +91,12 @@ public enum ComponentBuilder {
                 Self.reconfigure(view: contentView, with: content[state])
             }
             return tap
+        case let .disclosure(vm, child):
+            let disclosure = EDisclosure()
+            disclosure.configure(with: vm)
+            let childView = build(from: child)
+            disclosure.setContent(childView)
+            return disclosure
         }
     }
 
@@ -210,6 +216,15 @@ public enum ComponentBuilder {
                     tap.setContent(newContentView)
                 }
             }
+        case let .disclosure(newVM, child):
+            guard let disclosure = view as? EDisclosure else { log("REBUILD: type mismatch"); return build(from: new) }
+            log("UPDATE: reconfigure")
+            disclosure.configure(with: newVM)
+            if let contentView = disclosure.contentView {
+                if let newContentView = update(view: contentView, with: child) {
+                    disclosure.setContent(newContentView)
+                }
+            }
         }
         return nil
     }
@@ -293,6 +308,13 @@ public enum ComponentBuilder {
             }
             if let contentView = tap.contentView {
                 reconfigure(view: contentView, with: content[tap.currentState])
+            }
+        case let .disclosure(vm, child):
+            assert(view is EDisclosure, "reconfigure type mismatch: expected EDisclosure, got \(type(of: view))")
+            let disclosure = view as! EDisclosure
+            disclosure.configure(with: vm)
+            if let contentView = disclosure.contentView {
+                reconfigure(view: contentView, with: child)
             }
         }
     }
