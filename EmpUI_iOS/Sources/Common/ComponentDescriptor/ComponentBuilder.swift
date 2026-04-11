@@ -32,6 +32,10 @@ public enum ComponentBuilder {
             let v = EProgressBar()
             v.configure(with: vm)
             return v
+        case let .textView(vm):
+            let v = ETextView()
+            v.configure(with: vm)
+            return v
         case let .infoCard(vm):
             let v = EInfoCard()
             v.configure(with: vm)
@@ -112,6 +116,11 @@ public enum ComponentBuilder {
             if bar.viewModel == newVM { log("SKIP"); return nil }
             log("UPDATE: reconfigure")
             bar.configure(with: newVM)
+        case let .textView(newVM):
+            guard let tv = view as? ETextView else { log("REBUILD: type mismatch"); return build(from: new) }
+            if tv.viewModel == newVM { log("SKIP"); return nil }
+            log("UPDATE: reconfigure")
+            tv.configure(with: newVM)
         case let .infoCard(newVM):
             guard let card = view as? EInfoCard else { log("REBUILD: type mismatch"); return build(from: new) }
             if card.viewModel == newVM { log("SKIP"); return nil }
@@ -253,6 +262,9 @@ public enum ComponentBuilder {
         case let .progressBar(vm):
             assert(view is EProgressBar, "reconfigure type mismatch: expected EProgressBar, got \(type(of: view))")
             (view as! EProgressBar).configure(with: vm)
+        case let .textView(vm):
+            assert(view is ETextView, "reconfigure type mismatch: expected ETextView, got \(type(of: view))")
+            (view as! ETextView).configure(with: vm)
         case let .infoCard(vm):
             assert(view is EInfoCard, "reconfigure type mismatch: expected EInfoCard, got \(type(of: view))")
             (view as! EInfoCard).configure(with: vm)

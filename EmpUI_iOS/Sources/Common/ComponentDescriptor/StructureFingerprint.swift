@@ -11,6 +11,7 @@ extension ComponentDescriptor {
         case .text:           return .leaf("text")
         case .image:          return .leaf("image")
         case .progressBar:    return .leaf("progressBar")
+        case .textView:       return .leaf("textView")
         case .infoCard:       return .leaf("infoCard")
         case .segmentControl: return .leaf("segmentControl")
         case let .stack(_, children):
