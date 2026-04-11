@@ -16,4 +16,5 @@ public enum ComponentDescriptor: Equatable {
     case spacer(ESpacer.ViewModel)
     indirect case scroll(EScroll.ViewModel, ComponentDescriptor)
     indirect case tap(ETapContainer.ViewModel, ControlParameter<ComponentDescriptor>)
+    case native(ENativeContainer.ViewModel)
 }

@@ -23,6 +23,8 @@ extension ComponentDescriptor {
             return .container("scroll", [child.fingerprint])
         case let .tap(_, content):
             return .container("tap", [content.normal.fingerprint])
+        case .native:
+            return .leaf("native")
         }
     }
 }

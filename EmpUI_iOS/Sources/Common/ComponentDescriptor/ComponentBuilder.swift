@@ -91,6 +91,10 @@ public enum ComponentBuilder {
                 Self.reconfigure(view: contentView, with: content[state])
             }
             return tap
+        case let .native(vm):
+            let v = ENativeContainer()
+            v.configure(with: vm)
+            return v
         }
     }
 
@@ -210,6 +214,11 @@ public enum ComponentBuilder {
                     tap.setContent(newContentView)
                 }
             }
+        case let .native(newVM):
+            guard let container = view as? ENativeContainer else { log("REBUILD: type mismatch"); return build(from: new) }
+            if container.viewModel == newVM { log("SKIP"); return nil }
+            log("UPDATE: reconfigure")
+            container.configure(with: newVM)
         }
         return nil
     }
@@ -294,6 +303,9 @@ public enum ComponentBuilder {
             if let contentView = tap.contentView {
                 reconfigure(view: contentView, with: content[tap.currentState])
             }
+        case let .native(vm):
+            assert(view is ENativeContainer, "reconfigure type mismatch: expected ENativeContainer, got \(type(of: view))")
+            (view as! ENativeContainer).configure(with: vm)
         }
     }
 }
