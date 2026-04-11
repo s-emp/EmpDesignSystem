@@ -58,4 +58,11 @@ public extension ComponentDescriptor {
     ) -> ComponentDescriptor {
         .scroll(viewModel, child())
     }
+
+    static func selection(
+        _ viewModel: ESelectionContainer.ViewModel,
+        content: () -> ControlParameter<ComponentDescriptor>
+    ) -> ComponentDescriptor {
+        .selection(viewModel, content())
+    }
 }

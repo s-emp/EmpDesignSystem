@@ -123,6 +123,17 @@ public enum ComponentBuilder {
                 Self.reconfigure(view: contentView, with: content[state])
             }
             return tap
+        case let .selection(vm, content):
+            assert(content.isStructurallyConsistent, "selection content must have the same structure across all states")
+            let sel = ESelectionContainer()
+            sel.configure(with: vm)
+            let childView = build(from: content.normal)
+            sel.setContent(childView)
+            sel.onStateChange = { [weak sel] state in
+                guard let sel, let contentView = sel.contentView else { return }
+                Self.reconfigure(view: contentView, with: content[state])
+            }
+            return sel
         }
     }
 
@@ -282,6 +293,19 @@ public enum ComponentBuilder {
                     tap.setContent(newContentView)
                 }
             }
+        case let .selection(newVM, content):
+            guard let sel = view as? ESelectionContainer else { log("REBUILD: type mismatch"); return build(from: new) }
+            log("UPDATE: reconfigure")
+            sel.configure(with: newVM)
+            sel.onStateChange = { [weak sel] state in
+                guard let sel, let contentView = sel.contentView else { return }
+                Self.reconfigure(view: contentView, with: content[state])
+            }
+            if let contentView = sel.contentView {
+                if let newContentView = update(view: contentView, with: content[sel.currentState]) {
+                    sel.setContent(newContentView)
+                }
+            }
         }
         return nil
     }
@@ -389,6 +413,17 @@ public enum ComponentBuilder {
             }
             if let contentView = tap.contentView {
                 reconfigure(view: contentView, with: content[tap.currentState])
+            }
+        case let .selection(vm, content):
+            assert(view is ESelectionContainer, "reconfigure type mismatch: expected ESelectionContainer, got \(type(of: view))")
+            let sel = view as! ESelectionContainer
+            sel.configure(with: vm)
+            sel.onStateChange = { [weak sel] state in
+                guard let sel, let contentView = sel.contentView else { return }
+                Self.reconfigure(view: contentView, with: content[state])
+            }
+            if let contentView = sel.contentView {
+                reconfigure(view: contentView, with: content[sel.currentState])
             }
         }
     }
