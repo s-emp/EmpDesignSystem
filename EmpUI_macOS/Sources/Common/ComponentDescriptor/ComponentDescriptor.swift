@@ -25,4 +25,5 @@ public enum ComponentDescriptor: Equatable {
     indirect case scroll(EScroll.ViewModel, ComponentDescriptor)
     indirect case tap(ETapContainer.ViewModel, ControlParameter<ComponentDescriptor>)
     indirect case selection(ESelectionContainer.ViewModel, ControlParameter<ComponentDescriptor>)
+    indirect case animation(EAnimationContainer.ViewModel, ComponentDescriptor)
 }
