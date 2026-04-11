@@ -143,6 +143,13 @@ public enum ComponentBuilder {
             let v = ENativeContainer()
             v.configure(with: vm)
             return v
+        case let .splitView(vm, children):
+            let split = ESplitView()
+            split.configure(with: vm)
+            for child in children {
+                split.addPanel(build(from: child))
+            }
+            return split
         }
     }
 
@@ -311,6 +318,10 @@ public enum ComponentBuilder {
             if container.viewModel == newVM { log("SKIP"); return nil }
             log("UPDATE: reconfigure")
             container.configure(with: newVM)
+        case let .splitView(newVM, _):
+            guard let split = view as? ESplitView else { log("REBUILD: type mismatch"); return build(from: new) }
+            log("UPDATE: reconfigure")
+            split.configure(with: newVM)
         }
         return nil
     }
@@ -467,6 +478,10 @@ public enum ComponentBuilder {
         case let .native(vm):
             assert(view is ENativeContainer, "reconfigure type mismatch: expected ENativeContainer, got \(type(of: view))")
             (view as! ENativeContainer).configure(with: vm)
+        case let .splitView(vm, _):
+            assert(view is ESplitView, "reconfigure type mismatch: expected ESplitView, got \(type(of: view))")
+            let split = view as! ESplitView
+            split.configure(with: vm)
         }
     }
 }

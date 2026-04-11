@@ -39,6 +39,8 @@ extension ComponentDescriptor {
             return .container("list", children.map(\.fingerprint))
         case .native:
             return .leaf("native")
+        case let .splitView(_, children):
+            return .container("splitView", children.map(\.fingerprint))
         }
     }
 }
