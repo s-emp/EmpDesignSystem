@@ -139,6 +139,10 @@ public enum ComponentBuilder {
             list.configure(with: vm)
             list.setItems(children)
             return list
+        case let .native(vm):
+            let v = ENativeContainer()
+            v.configure(with: vm)
+            return v
         }
     }
 
@@ -302,6 +306,11 @@ public enum ComponentBuilder {
             log("UPDATE: reconfigure")
             list.configure(with: newVM)
             list.setItems(children)
+        case let .native(newVM):
+            guard let container = view as? ENativeContainer else { log("REBUILD: type mismatch"); return build(from: new) }
+            if container.viewModel == newVM { log("SKIP"); return nil }
+            log("UPDATE: reconfigure")
+            container.configure(with: newVM)
         }
         return nil
     }
@@ -455,6 +464,9 @@ public enum ComponentBuilder {
             let list = view as! EListContainer
             list.configure(with: vm)
             list.setItems(children)
+        case let .native(vm):
+            assert(view is ENativeContainer, "reconfigure type mismatch: expected ENativeContainer, got \(type(of: view))")
+            (view as! ENativeContainer).configure(with: vm)
         }
     }
 }

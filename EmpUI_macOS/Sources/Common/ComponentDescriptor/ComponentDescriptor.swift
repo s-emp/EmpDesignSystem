@@ -27,4 +27,5 @@ public enum ComponentDescriptor: Equatable {
     indirect case selection(ESelectionContainer.ViewModel, ControlParameter<ComponentDescriptor>)
     indirect case animation(EAnimationContainer.ViewModel, ComponentDescriptor)
     indirect case list(EListContainer.ViewModel, [ComponentDescriptor])
+    case native(ENativeContainer.ViewModel)
 }
