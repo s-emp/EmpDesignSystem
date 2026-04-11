@@ -52,6 +52,10 @@ public enum ComponentBuilder {
             let v = EAnimationView()
             v.configure(with: vm)
             return v
+        case let .textField(vm):
+            let v = ETextField()
+            v.configure(with: vm)
+            return v
         case let .infoCard(vm):
             let v = EInfoCard()
             v.configure(with: vm)
@@ -157,6 +161,11 @@ public enum ComponentBuilder {
             if anim.viewModel == newVM { log("SKIP"); return nil }
             log("UPDATE: reconfigure")
             anim.configure(with: newVM)
+        case let .textField(newVM):
+            guard let field = view as? ETextField else { log("REBUILD: type mismatch"); return build(from: new) }
+            if field.viewModel == newVM { log("SKIP"); return nil }
+            log("UPDATE: reconfigure")
+            field.configure(with: newVM)
         case let .infoCard(newVM):
             guard let card = view as? EInfoCard else { log("REBUILD: type mismatch"); return build(from: new) }
             if card.viewModel == newVM { log("SKIP"); return nil }
@@ -313,6 +322,9 @@ public enum ComponentBuilder {
         case let .animationView(vm):
             assert(view is EAnimationView, "reconfigure type mismatch: expected EAnimationView, got \(type(of: view))")
             (view as! EAnimationView).configure(with: vm)
+        case let .textField(vm):
+            assert(view is ETextField, "reconfigure type mismatch: expected ETextField, got \(type(of: view))")
+            (view as! ETextField).configure(with: vm)
         case let .infoCard(vm):
             assert(view is EInfoCard, "reconfigure type mismatch: expected EInfoCard, got \(type(of: view))")
             (view as! EInfoCard).configure(with: vm)
