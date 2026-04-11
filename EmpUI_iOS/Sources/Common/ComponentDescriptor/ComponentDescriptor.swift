@@ -7,6 +7,7 @@ public enum ComponentDescriptor: Equatable {
     case image(EImage.ViewModel)
     case icon(EIcon.ViewModel)
     case progressBar(EProgressBar.ViewModel)
+    case activityIndicator(EActivityIndicator.ViewModel)
 
     // Составные компоненты
     case infoCard(EInfoCard.ViewModel)
