@@ -28,6 +28,10 @@ public enum ComponentBuilder {
             let v = EImage()
             v.configure(with: vm)
             return v
+        case let .icon(vm):
+            let v = EIcon()
+            v.configure(with: vm)
+            return v
         case let .progressBar(vm):
             let v = EProgressBar()
             v.configure(with: vm)
@@ -107,6 +111,11 @@ public enum ComponentBuilder {
             if image.viewModel == newVM { log("SKIP"); return nil }
             log("UPDATE: reconfigure")
             image.configure(with: newVM)
+        case let .icon(newVM):
+            guard let icon = view as? EIcon else { log("REBUILD: type mismatch"); return build(from: new) }
+            if icon.viewModel == newVM { log("SKIP"); return nil }
+            log("UPDATE: reconfigure")
+            icon.configure(with: newVM)
         case let .progressBar(newVM):
             guard let bar = view as? EProgressBar else { log("REBUILD: type mismatch"); return build(from: new) }
             if bar.viewModel == newVM { log("SKIP"); return nil }
@@ -250,6 +259,9 @@ public enum ComponentBuilder {
         case let .image(vm):
             assert(view is EImage, "reconfigure type mismatch: expected EImage, got \(type(of: view))")
             (view as! EImage).configure(with: vm)
+        case let .icon(vm):
+            assert(view is EIcon, "reconfigure type mismatch: expected EIcon, got \(type(of: view))")
+            (view as! EIcon).configure(with: vm)
         case let .progressBar(vm):
             assert(view is EProgressBar, "reconfigure type mismatch: expected EProgressBar, got \(type(of: view))")
             (view as! EProgressBar).configure(with: vm)
