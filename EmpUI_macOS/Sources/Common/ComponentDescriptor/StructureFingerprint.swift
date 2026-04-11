@@ -35,6 +35,8 @@ extension ComponentDescriptor {
             return .container("selection", [content.normal.fingerprint])
         case let .animation(_, child):
             return .container("animation", [child.fingerprint])
+        case let .list(_, children):
+            return .container("list", children.map(\.fingerprint))
         }
     }
 }

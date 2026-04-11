@@ -134,6 +134,11 @@ public enum ComponentBuilder {
             let childView = build(from: child)
             container.setContent(childView)
             return container
+        case let .list(vm, children):
+            let list = EListContainer()
+            list.configure(with: vm)
+            list.setItems(children)
+            return list
         }
     }
 
@@ -292,6 +297,11 @@ public enum ComponentBuilder {
                     container.setContent(newContentView)
                 }
             }
+        case let .list(newVM, children):
+            guard let list = view as? EListContainer else { log("REBUILD: type mismatch"); return build(from: new) }
+            log("UPDATE: reconfigure")
+            list.configure(with: newVM)
+            list.setItems(children)
         }
         return nil
     }
@@ -440,6 +450,11 @@ public enum ComponentBuilder {
             if let contentView = container.contentView {
                 reconfigure(view: contentView, with: child)
             }
+        case let .list(vm, children):
+            assert(view is EListContainer, "reconfigure type mismatch: expected EListContainer, got \(type(of: view))")
+            let list = view as! EListContainer
+            list.configure(with: vm)
+            list.setItems(children)
         }
     }
 }
