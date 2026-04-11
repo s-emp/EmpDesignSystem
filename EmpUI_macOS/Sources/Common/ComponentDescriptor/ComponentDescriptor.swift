@@ -12,6 +12,7 @@ public enum ComponentDescriptor: Equatable {
     // Составные компоненты
     case infoCard(EInfoCard.ViewModel)
     case segmentControl(ESegmentControl.ViewModel)
+    case dropdown(EDropdown.ViewModel)
 
     // Контейнеры
     indirect case stack(EStack.ViewModel, [ComponentDescriptor])

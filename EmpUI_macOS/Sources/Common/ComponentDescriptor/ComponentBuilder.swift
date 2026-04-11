@@ -44,6 +44,10 @@ public enum ComponentBuilder {
             let v = ESegmentControl()
             v.configure(with: vm)
             return v
+        case let .dropdown(vm):
+            let v = EDropdown()
+            v.configure(with: vm)
+            return v
         case let .stack(vm, children):
             let stack = EStack()
             stack.configure(with: vm)
@@ -125,6 +129,11 @@ public enum ComponentBuilder {
             if seg.viewModel == newVM { log("SKIP"); return nil }
             log("UPDATE: reconfigure")
             seg.configure(with: newVM)
+        case let .dropdown(newVM):
+            guard let dropdown = view as? EDropdown else { log("REBUILD: type mismatch"); return build(from: new) }
+            if dropdown.viewModel == newVM { log("SKIP"); return nil }
+            log("UPDATE: reconfigure")
+            dropdown.configure(with: newVM)
         case let .stack(newVM, newChildren):
             guard let stack = view as? EStack else { log("REBUILD: type mismatch"); return build(from: new) }
             log("UPDATE: reconfigure")
@@ -264,6 +273,9 @@ public enum ComponentBuilder {
         case let .segmentControl(vm):
             assert(view is ESegmentControl, "reconfigure type mismatch: expected ESegmentControl, got \(type(of: view))")
             (view as! ESegmentControl).configure(with: vm)
+        case let .dropdown(vm):
+            assert(view is EDropdown, "reconfigure type mismatch: expected EDropdown, got \(type(of: view))")
+            (view as! EDropdown).configure(with: vm)
         case let .stack(vm, children):
             assert(view is EStack, "reconfigure type mismatch: expected EStack, got \(type(of: view))")
             let stack = view as! EStack

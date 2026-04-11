@@ -14,6 +14,7 @@ extension ComponentDescriptor {
         case .slider:         return .leaf("slider")
         case .infoCard:       return .leaf("infoCard")
         case .segmentControl: return .leaf("segmentControl")
+        case .dropdown:       return .leaf("dropdown")
         case let .stack(_, children):
             return .container("stack", children.map(\.fingerprint))
         case let .overlay(_, children):
