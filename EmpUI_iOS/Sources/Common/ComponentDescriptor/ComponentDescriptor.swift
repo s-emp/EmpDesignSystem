@@ -9,6 +9,7 @@ public enum ComponentDescriptor: Equatable {
     case progressBar(EProgressBar.ViewModel)
     case activityIndicator(EActivityIndicator.ViewModel)
     case divider(EDivider.ViewModel)
+    case animationView(EAnimationView.ViewModel)
 
     // Составные компоненты
     case infoCard(EInfoCard.ViewModel)
