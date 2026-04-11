@@ -58,4 +58,11 @@ public extension ComponentDescriptor {
     ) -> ComponentDescriptor {
         .scroll(viewModel, child())
     }
+
+    static func splitView(
+        _ viewModel: ESplitView.ViewModel = ESplitView.ViewModel(),
+        @DescriptorBuilder children: () -> [ComponentDescriptor]
+    ) -> ComponentDescriptor {
+        .splitView(viewModel, children())
+    }
 }

@@ -85,6 +85,13 @@ public enum ComponentBuilder {
                 Self.reconfigure(view: contentView, with: content[state])
             }
             return tap
+        case let .splitView(vm, children):
+            let split = ESplitView()
+            split.configure(with: vm)
+            for child in children {
+                split.addPanel(build(from: child))
+            }
+            return split
         }
     }
 
@@ -181,6 +188,10 @@ public enum ComponentBuilder {
                     tap.setContent(newContentView)
                 }
             }
+        case let .splitView(newVM, _):
+            guard let split = view as? ESplitView else { log("REBUILD: type mismatch"); return build(from: new) }
+            log("UPDATE: reconfigure")
+            split.configure(with: newVM)
         }
         return nil
     }
@@ -287,6 +298,10 @@ public enum ComponentBuilder {
             if let contentView = tap.contentView {
                 reconfigure(view: contentView, with: content[tap.currentState])
             }
+        case let .splitView(vm, _):
+            assert(view is ESplitView, "reconfigure type mismatch: expected ESplitView, got \(type(of: view))")
+            let split = view as! ESplitView
+            split.configure(with: vm)
         }
     }
 }
