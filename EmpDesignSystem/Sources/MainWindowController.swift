@@ -5,7 +5,9 @@ final class MainWindowController: NSWindowController {
     private let splitView = ESplitView()
     private let sidebarBuilder = SidebarBuilder()
     private let previewBuilder = PreviewBuilder()
+    private let inspectorBuilder = InspectorBuilder()
     private var currentPage: ComponentPage?
+    private var inspectorPanel: NSView?
 
     init() {
         let window = NSWindow(
@@ -34,6 +36,7 @@ final class MainWindowController: NSWindowController {
         let sidebar = sidebarBuilder.build()
         let preview = previewBuilder.build()
         let inspector = makePanel(title: "Inspector", color: .Semantic.backgroundSecondary)
+        inspectorPanel = inspector
 
         let _ = splitView.addPanel(sidebar, minSize: 200, maxSize: 300)
         let _ = splitView.addPanel(preview, minSize: 400)
@@ -53,10 +56,50 @@ final class MainWindowController: NSWindowController {
                 view: makePlaceholder(for: item)
             )
             currentPage = nil
+            updateInspector(for: item, viewModel: nil)
             return
         }
         currentPage = page
         previewBuilder.showComponent(name: item.name, view: page.component)
+        updateInspector(for: item, viewModel: page.defaultViewModel)
+    }
+
+    private func updateInspector(for item: CatalogItem, viewModel: Any?) {
+        guard let panel = inspectorPanel else { return }
+
+        // Remove old inspector content
+        for subview in panel.subviews {
+            subview.removeFromSuperview()
+        }
+
+        guard let vm = viewModel else {
+            // Show placeholder for unknown components
+            let placeholder = makePanel(title: "Inspector", color: .Semantic.backgroundSecondary)
+            placeholder.translatesAutoresizingMaskIntoConstraints = false
+            panel.addSubview(placeholder)
+            NSLayoutConstraint.activate([
+                placeholder.topAnchor.constraint(equalTo: panel.topAnchor),
+                placeholder.leadingAnchor.constraint(equalTo: panel.leadingAnchor),
+                placeholder.trailingAnchor.constraint(equalTo: panel.trailingAnchor),
+                placeholder.bottomAnchor.constraint(equalTo: panel.bottomAnchor),
+            ])
+            return
+        }
+
+        inspectorBuilder.onViewModelChanged = { [weak self] newVM in
+            guard let self, let page = self.currentPage else { return }
+            page.configure(page.component, newVM)
+        }
+
+        let inspectorView = inspectorBuilder.build(for: item, viewModel: vm)
+        inspectorView.translatesAutoresizingMaskIntoConstraints = false
+        panel.addSubview(inspectorView)
+        NSLayoutConstraint.activate([
+            inspectorView.topAnchor.constraint(equalTo: panel.topAnchor),
+            inspectorView.leadingAnchor.constraint(equalTo: panel.leadingAnchor),
+            inspectorView.trailingAnchor.constraint(equalTo: panel.trailingAnchor),
+            inspectorView.bottomAnchor.constraint(equalTo: panel.bottomAnchor),
+        ])
     }
 
     private func makePlaceholder(for item: CatalogItem) -> NSView {
