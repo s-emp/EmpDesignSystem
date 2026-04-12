@@ -3,6 +3,9 @@ import EmpUI_macOS
 
 final class MainWindowController: NSWindowController {
     private let splitView = ESplitView()
+    private let sidebarBuilder = SidebarBuilder()
+    private let previewBuilder = PreviewBuilder()
+    private var currentPage: ComponentPage?
 
     init() {
         let window = NSWindow(
@@ -28,15 +31,45 @@ final class MainWindowController: NSWindowController {
             dividerStyle: .thin
         ))
 
-        let sidebar = makePanel(title: "Sidebar", color: .Semantic.backgroundSecondary)
-        let preview = makePanel(title: "Preview", color: .Semantic.backgroundPrimary)
+        let sidebar = sidebarBuilder.build()
+        let preview = previewBuilder.build()
         let inspector = makePanel(title: "Inspector", color: .Semantic.backgroundSecondary)
 
         let _ = splitView.addPanel(sidebar, minSize: 200, maxSize: 300)
         let _ = splitView.addPanel(preview, minSize: 400)
         let _ = splitView.addPanel(inspector, minSize: 260, maxSize: 400)
 
+        sidebarBuilder.onItemSelected = { [weak self] item in
+            self?.handleItemSelected(item)
+        }
+
         window?.contentView = splitView
+    }
+
+    private func handleItemSelected(_ item: CatalogItem) {
+        guard let page = ComponentFactory.makePage(for: item.id) else {
+            previewBuilder.showComponent(
+                name: "\(item.name) (coming soon)",
+                view: makePlaceholder(for: item)
+            )
+            currentPage = nil
+            return
+        }
+        currentPage = page
+        previewBuilder.showComponent(name: item.name, view: page.component)
+    }
+
+    private func makePlaceholder(for item: CatalogItem) -> NSView {
+        let label = EText()
+        let _ = label.configure(with: .init(
+            content: .plain(.init(
+                text: "\(item.name) — not yet implemented",
+                font: .systemFont(ofSize: 14),
+                color: .Semantic.textTertiary
+            )),
+            alignment: .center
+        ))
+        return label
     }
 
     private func makePanel(title: String, color: NSColor) -> NSView {
