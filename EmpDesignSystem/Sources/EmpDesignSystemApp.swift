@@ -1,10 +1,11 @@
-import SwiftUI
+import Cocoa
 
 @main
-struct EmpDesignSystemApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
+class AppMain {
+    static func main() {
+        let app = NSApplication.shared
+        let delegate = AppDelegate()
+        app.delegate = delegate
+        app.run()
     }
 }
