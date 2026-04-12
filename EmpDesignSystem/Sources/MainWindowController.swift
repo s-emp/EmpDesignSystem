@@ -38,15 +38,21 @@ final class MainWindowController: NSWindowController {
         let inspector = makePanel(title: "Inspector", color: .Semantic.backgroundSecondary)
         inspectorPanel = inspector
 
-        let _ = splitView.addPanel(sidebar, minSize: 200, maxSize: 300)
-        let _ = splitView.addPanel(preview, minSize: 400)
-        let _ = splitView.addPanel(inspector, minSize: 260, maxSize: 400)
+        splitView.addPanel(sidebar, minSize: 200, maxSize: 300, holdingPriority: .init(260))
+        splitView.addPanel(preview, minSize: 400, holdingPriority: .init(200))
+        splitView.addPanel(inspector, minSize: 260, maxSize: 400, holdingPriority: .init(260))
 
         sidebarBuilder.onItemSelected = { [weak self] item in
             self?.handleItemSelected(item)
         }
 
         window?.contentView = splitView
+
+        // Set initial divider positions after layout
+        DispatchQueue.main.async { [weak self] in
+            self?.splitView.setDividerPosition(220, at: 0)
+            self?.splitView.setDividerPosition(1200 - 280, at: 1)
+        }
     }
 
     private func handleItemSelected(_ item: CatalogItem) {

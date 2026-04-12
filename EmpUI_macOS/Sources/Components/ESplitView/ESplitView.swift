@@ -53,11 +53,18 @@ public final class ESplitView: NSView, EComponent {
     }
 
     @discardableResult
-    public func addPanel(_ view: NSView, minSize: CGFloat? = nil, maxSize: CGFloat? = nil) -> Self {
+    public func addPanel(_ view: NSView, minSize: CGFloat? = nil, maxSize: CGFloat? = nil, holdingPriority: NSLayoutConstraint.Priority = .defaultLow) -> Self {
+        let index = splitView.arrangedSubviews.count
         splitView.addArrangedSubview(view)
+        splitView.setHoldingPriority(holdingPriority, forSubviewAt: index)
         panelConstraints.append((min: minSize, max: maxSize))
         updateDelegate()
         return self
+    }
+
+    /// Set initial divider positions after panels are added
+    public func setDividerPosition(_ position: CGFloat, at dividerIndex: Int) {
+        splitView.setPosition(position, ofDividerAt: dividerIndex)
     }
 
     private func updateDelegate() {
