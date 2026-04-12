@@ -50,6 +50,21 @@ final class MainWindowController: NSWindowController {
     }
 
     private func handleItemSelected(_ item: CatalogItem) {
+        // Token pages — no inspector, just showcase
+        if TokenPages.isTokenPage(item.id) {
+            currentPage = nil
+            if let tokenView = TokenPages.makePage(for: item.id) {
+                previewBuilder.showComponent(name: item.name, view: tokenView)
+            } else {
+                previewBuilder.showComponent(
+                    name: "\(item.name) (coming soon)",
+                    view: makePlaceholder(for: item)
+                )
+            }
+            updateInspectorWithText("Token showcase")
+            return
+        }
+
         guard let page = ComponentFactory.makePage(for: item.id) else {
             previewBuilder.showComponent(
                 name: "\(item.name) (coming soon)",
@@ -99,6 +114,22 @@ final class MainWindowController: NSWindowController {
             inspectorView.leadingAnchor.constraint(equalTo: panel.leadingAnchor),
             inspectorView.trailingAnchor.constraint(equalTo: panel.trailingAnchor),
             inspectorView.bottomAnchor.constraint(equalTo: panel.bottomAnchor),
+        ])
+    }
+
+    private func updateInspectorWithText(_ text: String) {
+        guard let panel = inspectorPanel else { return }
+        for subview in panel.subviews {
+            subview.removeFromSuperview()
+        }
+        let placeholder = makePanel(title: text, color: .Semantic.backgroundSecondary)
+        placeholder.translatesAutoresizingMaskIntoConstraints = false
+        panel.addSubview(placeholder)
+        NSLayoutConstraint.activate([
+            placeholder.topAnchor.constraint(equalTo: panel.topAnchor),
+            placeholder.leadingAnchor.constraint(equalTo: panel.leadingAnchor),
+            placeholder.trailingAnchor.constraint(equalTo: panel.trailingAnchor),
+            placeholder.bottomAnchor.constraint(equalTo: panel.bottomAnchor),
         ])
     }
 
