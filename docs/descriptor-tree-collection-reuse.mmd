@@ -1,0 +1,56 @@
+---
+title: Descriptor Tree — Collection Reuse Cycle
+---
+
+sequenceDiagram
+    participant VC as ViewController
+    participant DS as DiffableDataSource
+    participant CV as UICollectionView
+    participant Cell as EmpCollectionCell
+    participant CB as ComponentBuilder
+    participant FP as StructureFingerprint
+
+    Note over VC: Первичная загрузка данных
+
+    VC->>DS: apply(snapshot) с EmpItem[]
+    DS->>CV: insert cells
+    CV->>Cell: dequeue (новая ячейка)
+    Cell->>FP: descriptor.fingerprint
+    Note over Cell: currentFingerprint = nil<br/>→ BUILD
+    Cell->>CB: build(from: descriptor)
+    CB-->>Cell: готовое view-дерево
+    Note over Cell: rootView = view<br/>currentFingerprint = fp
+
+    Note over VC: Скролл — ячейка уходит за экран
+
+    CV->>Cell: prepareForReuse()
+    Note over Cell: rootView НЕ удаляется<br/>fingerprint сохранён
+
+    Note over VC: Новая ячейка нужна
+
+    CV->>Cell: dequeue (переиспользованная)
+    Cell->>FP: newDescriptor.fingerprint
+
+    alt Fingerprint совпадает ✅
+        Note over Cell: RECONFIGURE
+        Cell->>CB: reconfigure(view: rootView, with: newDescriptor)
+        CB->>CB: zip(subviews, children)
+        CB->>CB: configure(with: newVM) для каждого
+        Note over Cell: View-иерархия та же<br/>Данные обновлены
+    else Fingerprint НЕ совпадает ⚠️
+        Note over Cell: REBUILD (логируется)
+        Cell->>Cell: rootView.removeFromSuperview()
+        Cell->>CB: build(from: newDescriptor)
+        CB-->>Cell: новое view-дерево
+        Note over Cell: rootView = newView<br/>currentFingerprint = newFp
+    end
+
+    Note over VC: Обновление данных (баланс изменился)
+
+    VC->>DS: snapshot.reconfigureItems([updatedItem])
+    DS->>CV: reconfigure cell
+    CV->>Cell: configure(with: updatedDescriptor)
+    Cell->>FP: updatedDescriptor.fingerprint
+    Note over Cell: Fingerprint совпадает ✅<br/>→ RECONFIGURE
+    Cell->>CB: reconfigure(view: rootView, with: updatedDescriptor)
+    Note over Cell: Только данные обновились<br/>View-иерархия не тронута

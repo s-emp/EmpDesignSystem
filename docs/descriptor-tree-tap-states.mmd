@@ -1,0 +1,45 @@
+---
+title: EmpTapContainer — State Machine & Reconfigure
+---
+
+stateDiagram-v2
+    [*] --> Normal
+
+    Normal --> Highlighted: touchDown /<br/>isHighlighted = true
+    Highlighted --> Normal: touchUp /<br/>isHighlighted = false
+
+    Normal --> Hover: hoverBegan<br/>(UIHoverGestureRecognizer /<br/>NSTrackingArea)
+    Hover --> Normal: hoverEnded
+    Hover --> Highlighted: touchDown
+
+    Normal --> Disabled: isEnabled = false
+    Highlighted --> Disabled: isEnabled = false
+    Hover --> Disabled: isEnabled = false
+    Disabled --> Normal: isEnabled = true
+
+    state Normal {
+        [*] --> NormalDesc: onStateChange(.normal)
+        NormalDesc: reconfigure(view, with: content[.normal])
+    }
+
+    state Highlighted {
+        [*] --> HighDesc: onStateChange(.highlighted)
+        HighDesc: reconfigure(view, with: content[.highlighted])
+    }
+
+    state Hover {
+        [*] --> HoverDesc: onStateChange(.hover)
+        HoverDesc: reconfigure(view, with: content[.hover])
+    }
+
+    state Disabled {
+        [*] --> DisDesc: onStateChange(.disabled)
+        DisDesc: reconfigure(view, with: content[.disabled])
+    }
+
+    note right of Normal
+        Все состояния имеют
+        одинаковый fingerprint —
+        меняются только данные
+        (цвета, opacity)
+    end note

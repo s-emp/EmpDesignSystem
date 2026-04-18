@@ -1,0 +1,117 @@
+---
+title: Descriptor Tree — Architecture
+---
+
+graph TB
+    subgraph Layer0["Layer 0: Существующие компоненты (без изменений)"]
+        direction LR
+        EmpText["EmpText<br/><i>UIView / NSView</i>"]
+        EmpImage["EmpImage<br/><i>UIView / NSView</i>"]
+        EmpProgressBar["EmpProgressBar<br/><i>UIView / NSView</i>"]
+        EmpInfoCard["EmpInfoCard<br/><i>UIView / NSView</i>"]
+        EmpSegmentControl["EmpSegmentControl<br/><i>UIView / NSView</i>"]
+    end
+
+    subgraph Layer1["Layer 1: ComponentDescriptor (иммутабельное дерево данных)"]
+        direction TB
+        CD["enum ComponentDescriptor"]
+
+        subgraph Leaves["Leaf cases"]
+            direction LR
+            CText[".text(EmpText.ViewModel)"]
+            CImage[".image(EmpImage.ViewModel)"]
+            CProgress[".progressBar(EmpProgressBar.ViewModel)"]
+            CInfoCard[".infoCard(EmpInfoCard.ViewModel)"]
+            CSegment[".segmentControl(EmpSegmentControl.ViewModel)"]
+        end
+
+        subgraph Containers["Container cases (indirect)"]
+            direction LR
+            CHStack[".hStack(HStackConfig, [children])"]
+            CVStack[".vStack(VStackConfig, [children])"]
+            CZStack[".zStack(ZStackConfig, [children])"]
+            CSpacer[".spacer(SpacerConfig)"]
+            CTap[".tap(TapConfig, ControlParameter&lt;CD&gt;)"]
+            CScroll[".scroll(ScrollConfig, child)"]
+        end
+
+        CD --> Leaves
+        CD --> Containers
+    end
+
+    subgraph Layer15["Layer 1.5: DescriptorBuilder (Result Builder DSL)"]
+        DB["@resultBuilder DescriptorBuilder<br/><i>buildBlock, buildEither,<br/>buildOptional, buildArray</i>"]
+        Factories["Фабрики с trailing closure<br/><i>.hStack { }, .vStack { }, .tap { }</i>"]
+        DB --> Factories
+    end
+
+    subgraph Layer2["Layer 2: StructureFingerprint"]
+        FP["enum StructureFingerprint: Hashable"]
+        FPLeaf[".leaf(String)<br/><i>leaf('text'), leaf('image')...</i>"]
+        FPContainer[".container(String, [children])<br/><i>только типы + количество,<br/>без данных</i>"]
+        FP --> FPLeaf
+        FP --> FPContainer
+    end
+
+    subgraph Layer3["Layer 3: ComponentBuilder"]
+        CB["enum ComponentBuilder"]
+        Build["build(from: CD) → UIView<br/><i>Создаёт view-дерево с нуля.<br/>Сохраняет descriptor на view.</i>"]
+        Update["update(view:, with: CD) → UIView?<br/><i>Diff-based: skip / reconfigure / rebuild.<br/>Рекурсивный спуск с ранним выходом.</i>"]
+        Reconfig["reconfigure(view:, with: CD)<br/><i>Безусловное обновление данных.<br/>Для TapContainer state changes.</i>"]
+        CB --> Build
+        CB --> Update
+        CB --> Reconfig
+    end
+
+    subgraph Storage["Хранение состояния"]
+        AssocObj["UIView.currentDescriptor<br/><i>objc_setAssociatedObject</i><br/>Каждый view хранит свой descriptor"]
+    end
+
+    subgraph NewComponents["Новые компоненты"]
+        TapContainer["EmpTapContainer<br/><i>UIControl / NSControl</i><br/>actionID, onStateChange"]
+    end
+
+    subgraph Presets["Button Presets (фабрики)"]
+        BPFilled["ButtonPreset.filled()"]
+        BPOutlined["ButtonPreset.outlined()"]
+        BPGhost["ButtonPreset.ghost()"]
+    end
+
+    subgraph Collection["Интеграция с коллекциями"]
+        EmpItem["EmpItem<br/><i>id + descriptor</i><br/>Hashable для DiffableDS"]
+        EmpCell["EmpCollectionCell<br/><i>fingerprint → update или rebuild</i>"]
+        DDS["DiffableDataSource<br/><i>UICollectionView / NSCollectionView</i>"]
+        EmpItem --> DDS
+        DDS --> EmpCell
+    end
+
+    %% Connections between layers
+    Factories -->|"создаёт"| CD
+    CD -->|".fingerprint"| FP
+    CD -->|"передаётся в"| Build
+    CD -->|"передаётся в"| Update
+    Build -->|"создаёт"| Layer0
+    Build -->|"создаёт"| TapContainer
+    Build -->|"сохраняет"| AssocObj
+    Update -->|"читает old из"| AssocObj
+    Update -->|"old == new → skip"| Update
+    Update -->|"fp совпал → configure(with:)"| Layer0
+    Update -->|"fp не совпал → build"| Build
+    Reconfig -->|"вызывает configure(with:)"| Layer0
+    Presets -->|"возвращает .tap()"| CD
+    TapContainer -->|"onStateChange"| Reconfig
+    EmpCell -->|"сравнивает fingerprint"| FP
+    EmpCell -->|"build или update"| CB
+
+    %% Styling
+    classDef enumStyle fill:#0f3460,stroke:#533483,color:#e0e0e0
+    classDef leafStyle fill:#162447,stroke:#1f4068,color:#e0e0e0
+    classDef newStyle fill:#533483,stroke:#e94560,color:#e0e0e0
+    classDef presetStyle fill:#1f4068,stroke:#1b1b2f,color:#e0e0e0
+    classDef storageStyle fill:#2d5a27,stroke:#4a8c3f,color:#e0e0e0
+
+    class CD,FP,CB,DB enumStyle
+    class EmpText,EmpImage,EmpProgressBar,EmpInfoCard,EmpSegmentControl leafStyle
+    class TapContainer newStyle
+    class BPFilled,BPOutlined,BPGhost presetStyle
+    class AssocObj storageStyle

@@ -53,11 +53,38 @@ public final class ESplitView: NSView, EComponent {
     }
 
     @discardableResult
-    public func addPanel(_ view: NSView, minSize: CGFloat? = nil, maxSize: CGFloat? = nil) -> Self {
+    public func addPanel(_ view: NSView, minSize: CGFloat? = nil, maxSize: CGFloat? = nil, holdingPriority: NSLayoutConstraint.Priority = .defaultLow) -> Self {
+        let index = splitView.arrangedSubviews.count
         splitView.addArrangedSubview(view)
+        splitView.setHoldingPriority(holdingPriority, forSubviewAt: index)
         panelConstraints.append((min: minSize, max: maxSize))
         updateDelegate()
         return self
+    }
+
+    /// Set initial divider positions after panels are added
+    public func setDividerPosition(_ position: CGFloat, at dividerIndex: Int) {
+        splitView.setPosition(position, ofDividerAt: dividerIndex)
+    }
+
+    /// Hide a panel by collapsing it
+    public func hidePanel(at index: Int) {
+        guard index < splitView.arrangedSubviews.count else { return }
+        let panel = splitView.arrangedSubviews[index]
+        panel.isHidden = true
+    }
+
+    /// Show a previously hidden panel
+    public func showPanel(at index: Int) {
+        guard index < splitView.arrangedSubviews.count else { return }
+        let panel = splitView.arrangedSubviews[index]
+        panel.isHidden = false
+    }
+
+    /// Check if panel is hidden
+    public func isPanelHidden(at index: Int) -> Bool {
+        guard index < splitView.arrangedSubviews.count else { return false }
+        return splitView.arrangedSubviews[index].isHidden
     }
 
     private func updateDelegate() {
