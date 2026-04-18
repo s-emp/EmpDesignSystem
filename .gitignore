@@ -24,3 +24,10 @@ playground.xcworkspace
 .dolt/
 *.db
 .beads-credential-key
+
+# Agent worktrees and transient skill data
+.claude/worktrees/
+.superpowers/
+
+# Temporary screenshots
+EmpDesignSystem_*.png

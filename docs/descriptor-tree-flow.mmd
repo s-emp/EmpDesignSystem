@@ -1,0 +1,58 @@
+---
+title: Descriptor Tree — Build / Update Flow
+---
+
+flowchart TD
+    Start([Данные изменились])
+    Start --> CreateDesc["Создать новый<br/>ComponentDescriptor"]
+
+    CreateDesc --> HasRoot{rootView<br/>существует?}
+
+    HasRoot -->|Нет, первый раз| BuildPath
+    HasRoot -->|Да| UpdateEntry["ComponentBuilder.update(view, new)"]
+
+    UpdateEntry --> UpdateNode
+
+    subgraph UpdateNode["update — рекурсивный спуск на каждом узле"]
+        direction TB
+        GetOld["old = view.currentDescriptor"]
+        GetOld --> EqCheck{"old == new?"}
+
+        EqCheck -->|Да| Skip(["SKIP ✅<br/>Ранний выход.<br/>Не спускаемся в children"])
+
+        EqCheck -->|Нет| FPCheck{"old.fingerprint<br/>== new.fingerprint?"}
+
+        FPCheck -->|Нет| Rebuild(["REBUILD 🔄<br/>return build(from: new)<br/>Parent заменит view"])
+
+        FPCheck -->|Да| Reconfigure["RECONFIGURE<br/>configure(with: newVM)<br/>view.currentDescriptor = new"]
+        Reconfigure --> HasChildren{"Есть children?"}
+
+        HasChildren -->|Нет, leaf| Done(["Готово ✅"])
+        HasChildren -->|Да, container| ChildLoop
+
+        subgraph ChildLoop["Для каждого child"]
+            direction TB
+            CallUpdate["result = update(childView, newChild)"]
+            CallUpdate --> NeedReplace{"result != nil?<br/>(rebuild)"}
+            NeedReplace -->|Нет| ChildOK(["Child обновлён<br/>на месте"])
+            NeedReplace -->|Да| Replace["Parent заменяет<br/>childView на result"]
+        end
+    end
+
+    subgraph BuildPath["BUILD — создание с нуля"]
+        direction TB
+        B1["ComponentBuilder.build(from: descriptor)"]
+        B2["Создать view по типу descriptor"]
+        B3["configure(with: vm)"]
+        B4["view.currentDescriptor = descriptor"]
+        B5["Рекурсивно build для children"]
+        B6(["Готовое view-дерево"])
+
+        B1 --> B2 --> B3 --> B4 --> B5 --> B6
+    end
+
+    style Skip fill:#2d5a27,stroke:#4a8c3f,color:#e0e0e0
+    style Rebuild fill:#8c3a3a,stroke:#b05050,color:#e0e0e0
+    style Reconfigure fill:#3a5a8c,stroke:#5080b0,color:#e0e0e0
+    style Done fill:#2d5a27,stroke:#4a8c3f,color:#e0e0e0
+    style ChildOK fill:#2d5a27,stroke:#4a8c3f,color:#e0e0e0

@@ -310,6 +310,7 @@ enum TokenPages {
 
         let clipView = scroll.contentView
         NSLayoutConstraint.activate([
+            content.topAnchor.constraint(equalTo: clipView.topAnchor),
             content.leadingAnchor.constraint(equalTo: clipView.leadingAnchor),
             content.trailingAnchor.constraint(equalTo: clipView.trailingAnchor),
         ])

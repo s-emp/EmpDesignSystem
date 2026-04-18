@@ -9,6 +9,53 @@ final class InspectorBuilder {
     // MARK: - Build
 
     func build(for item: CatalogItem, viewModel: Any) -> NSView {
+        // Outer container to hold header + scroll
+        let outerStack = EStack()
+        let _ = outerStack.configure(with: .init(
+            common: .init(backgroundColor: .Semantic.backgroundSecondary),
+            orientation: .vertical,
+            spacing: 0,
+            alignment: .leading,
+            distribution: .fill
+        ))
+
+        // Header bar — matches preview panel header style
+        let headerStack = EStack()
+        let _ = headerStack.configure(with: .init(
+            common: .init(
+                backgroundColor: .Semantic.backgroundTertiary,
+                layoutMargins: NSEdgeInsets(top: 12, left: 16, bottom: 12, right: 16)
+            ),
+            orientation: .horizontal,
+            spacing: 0
+        ))
+
+        let header = EText()
+        let _ = header.configure(with: .init(
+            content: .plain(.init(
+                text: "Inspector",
+                font: .systemFont(ofSize: 16, weight: .semibold),
+                color: .Semantic.textPrimary
+            ))
+        ))
+        headerStack.addArrangedSubview(header)
+
+        outerStack.addArrangedSubview(headerStack)
+        headerStack.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            headerStack.leadingAnchor.constraint(equalTo: outerStack.leadingAnchor),
+            headerStack.trailingAnchor.constraint(equalTo: outerStack.trailingAnchor),
+        ])
+
+        let headerDivider = EDivider()
+        let _ = headerDivider.configure(with: .init())
+        outerStack.addArrangedSubview(headerDivider)
+        headerDivider.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            headerDivider.leadingAnchor.constraint(equalTo: outerStack.leadingAnchor),
+            headerDivider.trailingAnchor.constraint(equalTo: outerStack.trailingAnchor),
+        ])
+
         let scroll = EScroll()
         let _ = scroll.configure(with: .init(
             common: .init(backgroundColor: .Semantic.backgroundSecondary),
@@ -17,31 +64,15 @@ final class InspectorBuilder {
 
         let stack = EStack()
         let _ = stack.configure(with: .init(
-            common: .init(layoutMargins: NSEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)),
+            common: .init(
+                backgroundColor: .Semantic.backgroundSecondary,
+                layoutMargins: NSEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+            ),
             orientation: .vertical,
-            spacing: 12,
+            spacing: 16,
             alignment: .leading,
             distribution: .fill
         ))
-
-        let header = EText()
-        let _ = header.configure(with: .init(
-            content: .plain(.init(
-                text: "Inspector",
-                font: .systemFont(ofSize: 14, weight: .bold),
-                color: .Semantic.textPrimary
-            ))
-        ))
-        stack.addArrangedSubview(header)
-
-        let divider = EDivider()
-        let _ = divider.configure(with: .init())
-        stack.addArrangedSubview(divider)
-        divider.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            divider.leadingAnchor.constraint(equalTo: stack.leadingAnchor),
-            divider.trailingAnchor.constraint(equalTo: stack.trailingAnchor),
-        ])
 
         let rows = makeRows(for: item.id, viewModel: viewModel)
         for row in rows {
@@ -63,7 +94,30 @@ final class InspectorBuilder {
             stack.trailingAnchor.constraint(equalTo: scroll.contentView.trailingAnchor),
         ])
 
-        return scroll
+        // Scroll fills remaining space
+        outerStack.addArrangedSubview(scroll)
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            scroll.leadingAnchor.constraint(equalTo: outerStack.leadingAnchor),
+            scroll.trailingAnchor.constraint(equalTo: outerStack.trailingAnchor),
+        ])
+        scroll.setContentHuggingPriority(.defaultLow, for: .vertical)
+        scroll.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+
+        // Left border to separate from preview panel
+        let leftBorder = NSView()
+        leftBorder.wantsLayer = true
+        leftBorder.layer?.backgroundColor = NSColor.Semantic.borderSubtle.cgColor
+        leftBorder.translatesAutoresizingMaskIntoConstraints = false
+        outerStack.addSubview(leftBorder)
+        NSLayoutConstraint.activate([
+            leftBorder.leadingAnchor.constraint(equalTo: outerStack.leadingAnchor),
+            leftBorder.topAnchor.constraint(equalTo: outerStack.topAnchor),
+            leftBorder.bottomAnchor.constraint(equalTo: outerStack.bottomAnchor),
+            leftBorder.widthAnchor.constraint(equalToConstant: 1),
+        ])
+
+        return outerStack
     }
 
     // MARK: - Router

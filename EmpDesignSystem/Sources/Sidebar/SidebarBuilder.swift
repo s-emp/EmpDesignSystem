@@ -19,6 +19,7 @@ final class SidebarBuilder {
         ))
 
         let _ = stack.configure(with: .init(
+            common: .init(backgroundColor: .Semantic.backgroundSecondary),
             orientation: .vertical,
             spacing: 0,
             alignment: .leading,
@@ -37,11 +38,11 @@ final class SidebarBuilder {
 
             let header = EText()
             let _ = header.configure(with: .init(
-                common: .init(layoutMargins: NSEdgeInsets(top: 12, left: 16, bottom: 4, right: 16)),
+                common: .init(layoutMargins: NSEdgeInsets(top: 16, left: 16, bottom: 4, right: 16)),
                 content: .plain(.init(
                     text: group.category.rawValue.uppercased(),
-                    font: .systemFont(ofSize: 10, weight: .semibold),
-                    color: .Semantic.textTertiary
+                    font: .systemFont(ofSize: 11, weight: .semibold),
+                    color: .Semantic.textSecondary
                 ))
             ))
             stack.addArrangedSubview(header)
@@ -57,10 +58,24 @@ final class SidebarBuilder {
 
         if let contentView = scroll.contentView as? NSClipView {
             NSLayoutConstraint.activate([
+                stack.topAnchor.constraint(equalTo: contentView.topAnchor),
                 stack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
                 stack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             ])
         }
+
+        // Right border to separate from preview panel
+        let rightBorder = NSView()
+        rightBorder.wantsLayer = true
+        rightBorder.layer?.backgroundColor = NSColor.Semantic.borderSubtle.cgColor
+        rightBorder.translatesAutoresizingMaskIntoConstraints = false
+        scroll.addSubview(rightBorder)
+        NSLayoutConstraint.activate([
+            rightBorder.trailingAnchor.constraint(equalTo: scroll.trailingAnchor),
+            rightBorder.topAnchor.constraint(equalTo: scroll.topAnchor),
+            rightBorder.bottomAnchor.constraint(equalTo: scroll.bottomAnchor),
+            rightBorder.widthAnchor.constraint(equalToConstant: 1),
+        ])
 
         return scroll
     }
@@ -97,7 +112,7 @@ final class SidebarBuilder {
         return container
     }
 
-    private func applySelection(itemId: String) {
+    func applySelection(itemId: String) {
         if let previousId = selectedItemId, let previousContainer = rowContainers[previousId] {
             let _ = previousContainer.configure(with: .init(
                 common: .init(backgroundColor: .clear),

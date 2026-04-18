@@ -67,6 +67,26 @@ public final class ESplitView: NSView, EComponent {
         splitView.setPosition(position, ofDividerAt: dividerIndex)
     }
 
+    /// Hide a panel by collapsing it
+    public func hidePanel(at index: Int) {
+        guard index < splitView.arrangedSubviews.count else { return }
+        let panel = splitView.arrangedSubviews[index]
+        panel.isHidden = true
+    }
+
+    /// Show a previously hidden panel
+    public func showPanel(at index: Int) {
+        guard index < splitView.arrangedSubviews.count else { return }
+        let panel = splitView.arrangedSubviews[index]
+        panel.isHidden = false
+    }
+
+    /// Check if panel is hidden
+    public func isPanelHidden(at index: Int) -> Bool {
+        guard index < splitView.arrangedSubviews.count else { return false }
+        return splitView.arrangedSubviews[index].isHidden
+    }
+
     private func updateDelegate() {
         let delegate = SplitViewDelegate(panelConstraints: panelConstraints)
         splitViewDelegate = delegate

@@ -56,20 +56,23 @@ final class MainWindowController: NSWindowController {
     }
 
     private func handleItemSelected(_ item: CatalogItem) {
-        // Token pages — no inspector, just showcase
+        // Token pages — hide inspector, show full-width showcase
         if TokenPages.isTokenPage(item.id) {
             currentPage = nil
+            splitView.hidePanel(at: 2)
             if let tokenView = TokenPages.makePage(for: item.id) {
-                previewBuilder.showComponent(name: item.name, view: tokenView)
+                previewBuilder.showFullContent(name: item.name, view: tokenView)
             } else {
                 previewBuilder.showComponent(
                     name: "\(item.name) (coming soon)",
                     view: makePlaceholder(for: item)
                 )
             }
-            updateInspectorWithText("Token showcase")
             return
         }
+
+        // Component pages — show inspector
+        splitView.showPanel(at: 2)
 
         guard let page = ComponentFactory.makePage(for: item.id) else {
             previewBuilder.showComponent(
@@ -159,13 +162,17 @@ final class MainWindowController: NSWindowController {
             alignment: .center
         ))
 
-        let stack = EStack()
-        let _ = stack.configure(with: .init(
-            common: .init(backgroundColor: color),
-            orientation: .vertical
-        ))
-        stack.addArrangedSubview(text)
+        let panel = NSView()
+        panel.wantsLayer = true
+        panel.layer?.backgroundColor = color.cgColor
 
-        return stack
+        text.translatesAutoresizingMaskIntoConstraints = false
+        panel.addSubview(text)
+        NSLayoutConstraint.activate([
+            text.centerXAnchor.constraint(equalTo: panel.centerXAnchor),
+            text.centerYAnchor.constraint(equalTo: panel.centerYAnchor),
+        ])
+
+        return panel
     }
 }
